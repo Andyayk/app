@@ -19,3 +19,8 @@ class JokeItem(scrapy.Item):
     	input_processor = MapCompose(remove_tags, remove_whitespace), #removing HTML tags and whitespace
     	output_processor = TakeFirst()
     )
+
+class QuoteItem(scrapy.Item):
+	title = scrapy.Field()
+	author = scrapy.Field()
+	tag = scrapy.Field()
