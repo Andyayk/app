@@ -13,12 +13,12 @@ def remove_whitespace(value):
 	return value.strip()
 
 class JokeItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    joke_text = scrapy.Field(
-    	input_processor = MapCompose(remove_tags, remove_whitespace), #removing HTML tags and whitespace
-    	output_processor = TakeFirst()
-    )
+	# define the fields for your item here like:
+	# name = scrapy.Field()
+	joke_text = scrapy.Field(
+		input_processor = MapCompose(remove_tags, remove_whitespace), #removing HTML tags and whitespace
+		output_processor = TakeFirst()
+	)
 
 class QuoteItem(scrapy.Item):
 	title = scrapy.Field()
