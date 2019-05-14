@@ -24,3 +24,14 @@ class QuoteItem(scrapy.Item):
 	title = scrapy.Field()
 	author = scrapy.Field()
 	tag = scrapy.Field()
+
+class HRPolicyRelationItem(scrapy.Item):
+	relationship = scrapy.Field()
+	name = scrapy.Field()
+	policyname = scrapy.Field()
+
+class DocumentItem(scrapy.Item):
+	document = scrapy.Field()	
+
+class HRPolicyInfoItem(scrapy.Item):
+	policyname = scrapy.Field()

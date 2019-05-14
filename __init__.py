@@ -9,16 +9,6 @@ graph = Graph(password = "1234")
 def get_index():
 	return render_template("index.html")
 
-@app.route('/test')
-def test():
-	query = '''
-	MATCH (tom {name: "Tom Hanks"}) RETURN tom
-	'''
-	results = graph.run(query).data()
-	print(results)
-
-	return results
-
 @app.route("/graph", methods=["GET"])
 def get_graph():
 	query = '''
