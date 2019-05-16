@@ -5,10 +5,11 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-import mysql.connector
+import mysql.connector, os
 from py2neo import Graph, Node, Relationship #neo4j
-from scrapyapp.items import HRPolicyRelationItem, DocumentItem, HRPolicyInfoItem
+from scrapyapp.items import HRPolicyRelationItem, DocumentItem
 
+path = os.path.normpath(os.getcwd() + os.sep + os.pardir + os.sep + "documents")
 graph = Graph(password = "1234")
 
 class ScrapyappPipeline(object):
@@ -21,20 +22,26 @@ class ScrapyappPipeline(object):
         return item
 
     def store_db(self, item):
-        if isinstance(item, HRPolicyInfoItem):
-            query = '''
-            CREATE (:Policy {name:{policyname}})
-            '''
-            results = graph.run(query, {"policyname": item['policyname']})
+        if isinstance(item, HRPolicyRelationItem):
+            policy = Node("Policy", name=item['policyname'])
+            relationship = item['relationship'].upper()
 
-        elif isinstance(item, HRPolicyRelationItem):
-            a = Node("Person", name=item['name'])
-            b = Node("Policy", name=item['policyname'])
-            relationship = Relationship.type(item['relationship'].upper())
-            graph.merge(relationship(a, b), "Person", "name")
+            if relationship == 'REVIEWED BY':
+                personlist = item['name'].split(",")
+
+                for p in personlist:
+                    person = Node("Person", name=p)
+                    relationship = Relationship.type(relationship)
+                    graph.merge(relationship(person, policy), "Person", "name")
+            else:
+                person = Node("Person", name=item['name'])
+                relationship = Relationship.type(relationship)
+                graph.merge(relationship(person, policy), "Person", "name")
 
         elif isinstance(item, DocumentItem):
-            pass
+            file = open(path + os.sep + item['policyname'] + ".txt","w") 
+            file.write(item['document'])
+            file.close()
 
     '''
     def __init__(self):

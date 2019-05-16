@@ -31,7 +31,5 @@ class HRPolicyRelationItem(scrapy.Item):
 	policyname = scrapy.Field()
 
 class DocumentItem(scrapy.Item):
-	document = scrapy.Field()	
-
-class HRPolicyInfoItem(scrapy.Item):
+	document = scrapy.Field()
 	policyname = scrapy.Field()
