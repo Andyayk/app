@@ -2,6 +2,14 @@ import scrapy
 from w3lib.html import remove_tags
 from scrapyapp.items import HRPolicyRelationItem, DocumentItem
 
+"""
+Useful commands:
+
+scrapy crawl jokes -o data.csv
+scrapy shell "http://quotes.toscrape.com"
+
+"""
+
 class HRSpider(scrapy.Spider):
 	name = 'hrpolicy'
 	start_urls = [

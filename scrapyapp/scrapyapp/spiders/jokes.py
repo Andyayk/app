@@ -2,13 +2,7 @@
 import scrapy
 from scrapyapp.items import JokeItem
 from scrapy.loader import ItemLoader
-"""
-Useful commands:
 
-scrapy crawl jokes -o data.csv
-scrapy shell "http://quotes.toscrape.com"
-
-"""
 class JokesSpider(scrapy.Spider):
 	name = 'jokes'
 
