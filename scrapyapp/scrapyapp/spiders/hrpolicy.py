@@ -59,7 +59,7 @@ class HRSpider(scrapy.Spider):
 				hrpolicyrelationitems['policyname'] = policyname #add policyname to item
 				hrpolicyrelationitems['relationship'] = row.xpath("td[1]//text()").extract_first() #add relationship to item
 				hrpolicyrelationitems['name'] = row.xpath("td[2]//text()").extract_first() #add person name to item
-  				
+				
 				yield hrpolicyrelationitems #return
 			
 		document = response.css("#node-page-full-group-content-wrapper").extract_first() #extract whole policy webpage

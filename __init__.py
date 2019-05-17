@@ -1,14 +1,16 @@
 import json
-from flask import Flask, Response, json, jsonify, request, Blueprint, render_template
+from flask import Flask, Response, json, jsonify, request, render_template
 from py2neo import Graph, Node, Relationship #neo4j
 
 app = Flask(__name__, static_folder='static', template_folder='static')
-graph = Graph(password = "1234")
+graph = Graph(password = "1234") #neo4j database
 
 @app.route("/", methods=["GET"])
 def get_index():
 	return render_template("index.html")
 
+
+"""
 @app.route("/graph", methods=["GET"])
 def get_graph():
 	query = '''
@@ -72,3 +74,4 @@ def get_movie(title):
 
 	return jsonify({"title": row["title"],
 			"cast": [dict(zip(("name", "job", "role"), member)) for member in row["cast"]]})
+"""
