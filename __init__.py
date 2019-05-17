@@ -9,6 +9,10 @@ graph = Graph(password = "1234") #neo4j database
 def get_index():
 	return render_template("index.html")
 
+@app.route("/test")
+def test():
+	my_dict = {"policyname": "Retirement policy", "relationship": "APPROVED BY", "name": "Council"}
+	return json.dumps(my_dict)
 
 """
 @app.route("/graph", methods=["GET"])
