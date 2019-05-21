@@ -20,12 +20,22 @@
 		  <div class="col-12 col-md-3">
 			<button type="submit" class="btn btn-block btn-lg btn-primary">Search!</button>
 		  </div>
-		</div>	
-		<ul>
-			<li v-for="row in results">
-				[[ row.policy.name ]]
-			</li>
-		</ul>		  	
+		</div>
+		<br><br>
+		<table class="table table-bordered table-hover">
+		  <thead class="thead-dark">
+		    <tr>
+		      <th scope="col">#</th>
+		      <th scope="col">Policy</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		    <tr class="table-light" v-for="row in results">
+		      <th scope="row">1</th>
+		      <td>[[ row.policy.name ]]</td>
+		    </tr>
+		  </tbody>
+		</table>				  	
 	  </form>
 	</div>
   </div>
@@ -55,7 +65,7 @@
 				}
 			}
 		})
-		
+
 		Vue.component('todo-item', {
 		  props: ['todo'],
 		  delimiters: ['[[', ']]'], //to prevent syntax error with jinja
