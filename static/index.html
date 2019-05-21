@@ -22,7 +22,7 @@
 		  </div>
 		</div>
 		<br><br>
-		<table class="table table-bordered table-hover">
+		<table id="example" class="table table-bordered table-hover">
 		  <thead class="thead-dark">
 		    <tr>
 		      <th scope="col">#</th>
@@ -30,12 +30,12 @@
 		    </tr>
 		  </thead>
 		  <tbody>
-		    <tr class="table-light" v-for="row in results">
-		      <th scope="row">1</th>
+		    <tr onclick="hello('row 1')" class="table-light" v-for="(row, index) in results">
+		      <th scope="row">[[ index + 1 ]]</th>
 		      <td>[[ row.policy.name ]]</td>
 		    </tr>
 		  </tbody>
-		</table>				  	
+		</table>	  	
 	  </form>
 	</div>
   </div>
@@ -65,6 +65,10 @@
 				}
 			}
 		})
+
+		function hello(text) {
+			alert(text);
+		}
 
 		Vue.component('todo-item', {
 		  props: ['todo'],
