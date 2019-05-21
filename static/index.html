@@ -11,16 +11,21 @@
 	<div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
 	  <form 
 	  id="searchbar"
-	  v-on:submit.prevent="fetchData"
+	  v-on:submit.prevent="search"
 	  >
 		<div class="form-row">
 		  <div class="col-12 col-md-9 mb-2 mb-md-0">
-			<input name="query" v-model="query" class="form-control form-control-lg" placeholder="Enter your query">
+			<input name="query" v-model="query" class="form-control form-control-lg" placeholder="Enter your query" required>
 		  </div>
 		  <div class="col-12 col-md-3">
 			<button type="submit" class="btn btn-block btn-lg btn-primary">Search!</button>
 		  </div>
-		</div>
+		</div>	
+		<ul>
+			<li v-for="row in results">
+				[[ row.policy.name ]]
+			</li>
+		</ul>		  	
 	  </form>
 	</div>
   </div>
@@ -30,58 +35,27 @@
 
 {% block scripts %}
 	<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script>
-		var myObject = new Vue({
-			el: '#app', //element name
-			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {
-				band: {}
-			},
-			mounted: function () {
-				this.fetchData();
-			},
-			methods: {
-				fetchData: function() {
-					this.$http.get('/test').then(response => {
-						this.band = response.body;
-					}, response => {
-						//error callback
-						console.log("error occurred");
-					});
-				}
-			}
-		})
-
 		var searchbar = new Vue({
-			el: '#searchbar',
+			el: '#searchbar', //element name
 			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {query: 'hello!'},	
-			// define methods under the `methods` object
-			methods: {
-				fetchData: function() {
-					this.$http.post('/test2', {query: this.query}).then(function(response) {
-						console.log("Success:")
-						console.log(response.data)
-					}, function(response) {
-						//error callback
-						console.log(response.data)
+			data: {query: '', results: ''},		
+			methods: { // define methods under the `methods` object
+				search: function() { //search method
+					this.$http.post('/search', { //post request
+						query: this.query //post query to flask
+					})
+					.then(function(response) {
+						this.results = response.data.results; //set post response as results
+					})
+					.catch(function (error) { //error callback
+						console.log(response.data);
 					});
 				}
 			}
 		})
-
-		var myObject3 = new Vue({
-			el: '#app3',
-			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {
-				todos: [
-				{text: 'Annual leaves'},
-				{text: 'Retirement policy'},
-				{text: 'Acting allowances'}
-				]
-			}
-		})
-
+		
 		Vue.component('todo-item', {
 		  props: ['todo'],
 		  delimiters: ['[[', ']]'], //to prevent syntax error with jinja

@@ -9,18 +9,25 @@ graph = Graph(password = "1234") #neo4j database
 def get_index():
 	return render_template("index.html")
 
-@app.route("/test")
-def test():
-	my_dict = {"policyname": "Retirement policy", "relationship": "APPROVED BY", "name": "Council"}
-	return json.dumps(my_dict)
+@app.route("/search", methods=["POST"])
+def search():
+	try:
+		q = request.json['query']
+	except KeyError:
+		return []
+	else:
+		query = '''
+		MATCH (policy:Policy)
+		WHERE policy.name =~ {name}
+		RETURN policy
+		'''
 
-@app.route("/test2", methods=["POST"])
-def test2():
-	query = request.form.get("query")
-	print(query)	
-	return jsonify(
-		query = "efg"
-	)
+		#get query that is case insensitive
+		results = graph.run(query, {"name": "(?i).*" + q + ".*"})
+
+		return jsonify(
+			results = [{"policy": dict(row["policy"])} for row in results]
+		)
 
 """
 @app.route("/graph", methods=["GET"])
@@ -52,24 +59,6 @@ def get_graph():
 			rels.append({"source": source, "target": target})
 			
 	return jsonify({"nodes": nodes, "links": rels})
-
-@app.route("/search", methods=["GET"])
-def get_search():
-	try:
-		q = request.args.get('q')
-	except KeyError:
-		return []
-	else:
-		query = '''
-		MATCH (movie:Movie)
-		WHERE movie.title =~ {title}
-		RETURN movie
-		'''
-
-		#get query that is case insensitive
-		results = graph.run(query, {"title": "(?i).*" + q + ".*"})
-
-		return jsonify([{"movie": dict(row["movie"])} for row in results])
 
 @app.route("/movie/<title>", methods=["GET"])
 def get_movie(title):

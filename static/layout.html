@@ -24,18 +24,6 @@
 
 {% block content %} {% endblock %}
 
-<div id="app">
-	<b>[[ band.policyname ]] [[ band.relationship ]] [[ band.name ]]</b>
-</div>
-
-<div id="app3">
- <ul>
-   <li v-for="x in todos">
-   [[ x.text ]]
-   </li>
-  </ul>
-</div>
-
 <div id="app-7">
   <ol>
     <!--
@@ -48,7 +36,7 @@
       v-for="item in groceryList"
       v-bind:todo="item"
       v-bind:key="item.id"
-    ></todo-item>
+    ></todo-item>  
   </ol>
 </div>
 
