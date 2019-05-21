@@ -14,6 +14,14 @@ def test():
 	my_dict = {"policyname": "Retirement policy", "relationship": "APPROVED BY", "name": "Council"}
 	return json.dumps(my_dict)
 
+@app.route("/test2", methods=["POST"])
+def test2():
+	query = request.form.get("query")
+	print(query)	
+	return jsonify(
+		query = "efg"
+	)
+
 """
 @app.route("/graph", methods=["GET"])
 def get_graph():

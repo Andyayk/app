@@ -9,10 +9,13 @@
 	  <h1 class="mb-5">HR Policies Graph Based Search</h1>
 	</div>
 	<div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-	  <form>
+	  <form 
+	  id="searchbar"
+	  v-on:submit.prevent="fetchData"
+	  >
 		<div class="form-row">
 		  <div class="col-12 col-md-9 mb-2 mb-md-0">
-			<input class="form-control form-control-lg" placeholder="Enter your query">
+			<input name="query" v-model="query" class="form-control form-control-lg" placeholder="Enter your query">
 		  </div>
 		  <div class="col-12 col-md-3">
 			<button type="submit" class="btn btn-block btn-lg btn-primary">Search!</button>
@@ -49,22 +52,52 @@
 			}
 		})
 
-		var myObject2 = new Vue({
-			el: '#app2',
+		var searchbar = new Vue({
+			el: '#searchbar',
 			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {message: 'hello!'}
+			data: {query: 'hello!'},	
+			// define methods under the `methods` object
+			methods: {
+				fetchData: function() {
+					this.$http.post('/test2', {query: this.query}).then(function(response) {
+						console.log("Success:")
+						console.log(response.data)
+					}, function(response) {
+						//error callback
+						console.log(response.data)
+					});
+				}
+			}
 		})
 
 		var myObject3 = new Vue({
-		    el: '#app3',
-		    delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-		    data: {
-		    todos: [
-		        { text: 'Annual leaves' },
-		        { text: 'Retirement policy' },
-		        { text: 'Acting allowances' }
-		        ]
-		    }
+			el: '#app3',
+			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
+			data: {
+				todos: [
+				{text: 'Annual leaves'},
+				{text: 'Retirement policy'},
+				{text: 'Acting allowances'}
+				]
+			}
 		})
+
+		Vue.component('todo-item', {
+		  props: ['todo'],
+		  delimiters: ['[[', ']]'], //to prevent syntax error with jinja
+		  template: '<li>[[ todo.text ]]</li>'
+		})	
+		
+		var app7 = new Vue({
+			el: '#app-7',
+			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
+			data: {
+				groceryList: [
+				{id: 0, text: 'Vegetables'},
+				{id: 1, text: 'Cheese'},
+				{id: 2, text: 'Milk'}
+				]
+			}
+		})	
 	</script>
 {% endblock %}
