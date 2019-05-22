@@ -22,20 +22,28 @@
 		  </div>
 		</div>
 		<br><br>
-		<table id="example" class="table table-bordered table-hover">
+		<table id="policytable" class="table table-bordered table-hover">
 		  <thead class="thead-dark">
-		    <tr>
-		      <th scope="col">#</th>
-		      <th scope="col">Policy</th>
-		    </tr>
+			<tr>
+			  <th scope="col">#</th>
+			  <th scope="col">Policy</th>
+			</tr>
 		  </thead>
 		  <tbody>
-		    <tr onclick="hello('row 1')" class="table-light" v-for="(row, index) in results">
-		      <th scope="row">[[ index + 1 ]]</th>
-		      <td>[[ row.policy.name ]]</td>
-		    </tr>
+			<tr onclick="get_people(this)" class="table-light" v-for="(row, index) in results">
+			  <th scope="row">[[ index + 1 ]]</th>
+			  <td>[[ row.policy.name ]]</td>
+			</tr>
 		  </tbody>
-		</table>	  	
+		</table>		
+		<div class="card">
+		  <div class="card-body">
+			<h5 id="policyname" class="card-title">Policy Info</h5>
+			<p id="policyinfo" class="card-text"></p>
+			<a class="card-link">Link</a>
+			<a class="card-link">Another Link</a>
+		  </div>
+		</div>	
 	  </form>
 	</div>
   </div>
@@ -45,7 +53,7 @@
 
 {% block scripts %}
 	<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
-	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
 	<script>
 		var searchbar = new Vue({
 			el: '#searchbar', //element name
@@ -66,26 +74,30 @@
 			}
 		})
 
-		function hello(text) {
-			alert(text);
-		}
+		function get_people(element) {
+			policyname = $(element).find('td:first').text();
+			document.getElementById("policyname").innerHTML = policyname + " Info";
+			$.get('/get_people/' + policyname, function(data, status){
+				policyinforesults = data.results;
 
-		Vue.component('todo-item', {
-		  props: ['todo'],
-		  delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-		  template: '<li>[[ todo.text ]]</li>'
-		})	
-		
-		var app7 = new Vue({
-			el: '#app-7',
-			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {
-				groceryList: [
-				{id: 0, text: 'Vegetables'},
-				{id: 1, text: 'Cheese'},
-				{id: 2, text: 'Milk'}
-				]
-			}
-		})	
+				var list = document.getElementById('policyinfo'); //remove previous list
+					while (list.hasChildNodes()) {
+						list.removeChild(list.firstChild);
+					}
+				if (policyinforesults != null) {
+					var ul = document.createElement('ul'); //create list
+					document.getElementById('policyinfo').appendChild(ul); //append to list
+
+					for(var key in policyinforesults) {
+						name = policyinforesults[key];
+						relationship = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
+
+						var li = document.createElement('li');
+						ul.appendChild(li);
+						li.innerHTML += "<b>" + relationship + "</b>: " + name;
+					};
+				};						
+			});
+		}		
 	</script>
 {% endblock %}

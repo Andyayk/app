@@ -22,12 +22,59 @@ def search():
 		RETURN policy
 		'''
 
+		querytest = '''
+		MATCH (policy:Policy)
+		WHERE policy.name =~ {name}
+		RETURN policy
+		LIMIT 1
+		'''		
+
 		#get query that is case insensitive
 		results = graph.run(query, {"name": "(?i).*" + q + ".*"})
+		resultstest = graph.run(querytest, {"name": "(?i).*" + q + ".*"}) #checking if there are any results
+
+		if resultstest.evaluate(): #if there are results
+			return jsonify(
+				results = [{"policy": dict(row["policy"])} for row in results]
+			)
+		else:
+			return jsonify(
+				results = [{"policy": ""}]
+			)	
+
+@app.route("/get_people/<name>", methods=["GET"])
+def get_people(name):
+	query = '''
+	MATCH (people:Person)-[relatedTo]-(:Policy {name: {name}}) 
+	RETURN people.name as name, Type(relatedTo) as relationship
+	'''
+
+	querytest = '''
+	MATCH (people:Person)-[relatedTo]-(:Policy {name: {name}}) 
+	RETURN people.name as name, Type(relatedTo) as relationship 
+	LIMIT 1
+	'''
+
+	results = graph.run(query, {"name": name})
+	resultstest = graph.run(querytest, {"name": name}) #checking if there are any results
+
+	dictionary = {}
+
+	if resultstest.evaluate(): #if there are results
+		for row in results: #change into dictionary format
+			relationship = row["relationship"]
+			if relationship in dictionary:
+				dictionary[relationship] = dictionary[relationship] + ", " + row["name"]
+			else:
+				dictionary[relationship] = row["name"]
 
 		return jsonify(
-			results = [{"policy": dict(row["policy"])} for row in results]
+			results = dictionary
 		)
+	else:
+		return jsonify(
+			results = None
+		)	
 
 """
 @app.route("/graph", methods=["GET"])

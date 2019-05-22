@@ -1,0 +1,20 @@
+p {
+  color: black;
+}
+
+.card {
+  color: black;
+}
+
+h1.mb-5 {
+  color: #2F4F4F;
+}
+
+ul {
+list-style-type: none;
+text-align: left;
+}
+
+.display {
+  color: black;
+}
