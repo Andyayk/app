@@ -39,7 +39,7 @@ def search():
 			)
 		else:
 			return jsonify(
-				results = [{"policy": ""}]
+				results = [{"policy": {"name": "No Results Found!"}}]
 			)	
 
 @app.route("/get_people/<name>", methods=["GET"])

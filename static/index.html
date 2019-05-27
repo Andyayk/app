@@ -22,6 +22,8 @@
 		  </div>
 		</div>
 		<br><br>
+
+		<template v-if="showpolicytable">
 		<table id="policytable" class="table table-bordered table-hover">
 		  <thead class="thead-dark">
 			<tr>
@@ -32,18 +34,19 @@
 		  <tbody>
 			<tr onclick="get_people(this)" class="table-light" v-for="(row, index) in results">
 			  <th scope="row">[[ index + 1 ]]</th>
-			  <td>[[ row.policy.name ]]</td>
+			  <td style="cursor: pointer;">[[ row.policy.name ]]</td>
 			</tr>
 		  </tbody>
-		</table>		
+		</table>
+
 		<div class="card">
 		  <div class="card-body">
 			<h5 id="policyname" class="card-title">Policy Info</h5>
 			<p id="policyinfo" class="card-text"></p>
-			<a class="card-link">Link</a>
-			<a class="card-link">Another Link</a>
+			<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
 		  </div>
-		</div>	
+		</div>
+		</template>
 	  </form>
 	</div>
   </div>
@@ -58,13 +61,14 @@
 		var searchbar = new Vue({
 			el: '#searchbar', //element name
 			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {query: '', results: ''},		
+			data: {query: '', results: '', showpolicytable: false},		
 			methods: { // define methods under the `methods` object
 				search: function() { //search method
 					this.$http.post('/search', { //post request
 						query: this.query //post query to flask
 					})
 					.then(function(response) {
+						this.showpolicytable = true; //show table to user
 						this.results = response.data.results; //set post response as results
 					})
 					.catch(function (error) { //error callback
@@ -76,7 +80,7 @@
 
 		function get_people(element) {
 			policyname = $(element).find('td:first').text();
-			document.getElementById("policyname").innerHTML = policyname + " Info";
+			document.getElementById("policyname").innerHTML = policyname; //set title
 			$.get('/get_people/' + policyname, function(data, status){
 				policyinforesults = data.results;
 
