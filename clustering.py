@@ -66,18 +66,21 @@ for x in processedWords:
 vectorizer = TfidfVectorizer(analyzer='word') #tfidf
 words_tfidf = vectorizer.fit_transform(stringOfTokenizedWords) #tfidf
 
-#terms = vectorizer.get_feature_names()
+features = vectorizer.get_feature_names() #get list of features
 
-#df3 = pd.DataFrame(words_tfidf.toarray(), columns=terms) #creating dataframe
+processeddf = pd.DataFrame(words_tfidf.toarray(), columns=features) #creating dataframe
 
-#dist = 1 - cosine_similarity(words_tfidf)
-
-num_clusters = 5
-kmeans = KMeans(n_clusters=num_clusters).fit(words_tfidf)
-clusters = kmeans.labels_.tolist()
-
-print(clusters)
-print(kmeans.cluster_centers_)
+sse = {}
+for k in range(1, 30):
+    kmeans = KMeans(n_clusters=k, max_iter=1000).fit(processeddf)
+    processeddf["clusters"] = kmeans.labels_
+    #print(processeddf["clusters"])
+    sse[k] = kmeans.inertia_ #inertia: Sum of distances of samples to their closest cluster center
+plt.figure()
+plt.plot(list(sse.keys()), list(sse.values()))
+plt.xlabel("Number of cluster")
+plt.ylabel("SSE")
+plt.show()
 
 '''
 stop_list = nltk.corpus.stopwords.words('english')
