@@ -13,6 +13,7 @@ colorama==0.4.1
 constantly==15.1.0
 cryptography==2.6.1
 cssselect==1.0.3
+cycler==0.10.0
 docutils==0.14
 Flask==1.0.2
 gensim==3.7.3
@@ -23,8 +24,10 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 jmespath==0.9.4
 joblib==0.13.2
+kiwisolver==1.1.0
 lxml==4.3.3
 MarkupSafe==1.1.1
+matplotlib==3.1.0
 mysql-connector-python==8.0.16
 neo4j-driver==1.7.3
 neobolt==1.7.12
@@ -43,6 +46,7 @@ PyDispatcher==2.0.5
 Pygments==2.3.1
 PyHamcrest==1.9.0
 pyOpenSSL==19.0.0
+pyparsing==2.4.0
 pypiwin32==223
 python-dateutil==2.8.0
 pytz==2019.1
