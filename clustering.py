@@ -2,7 +2,7 @@ import nltk, re, k_means, gensim, os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, AgglomerativeClustering
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem.porter import *
@@ -13,6 +13,7 @@ from sklearn.pipeline import Pipeline
 from sklearn import metrics
 from pandas import DataFrame
 from sklearn.metrics.pairwise import cosine_similarity
+from scipy.cluster.hierarchy import dendrogram, linkage
 
 
 directory = os.getcwd() + '/documents' #documents directory
@@ -76,82 +77,17 @@ for k in range(1, 30):
     processeddf["clusters"] = kmeans.labels_
     #print(processeddf["clusters"])
     sse[k] = kmeans.inertia_ #inertia: Sum of distances of samples to their closest cluster center
+
 plt.figure()
 plt.plot(list(sse.keys()), list(sse.values()))
 plt.xlabel("Number of cluster")
 plt.ylabel("SSE")
 plt.show()
 
-'''
-stop_list = nltk.corpus.stopwords.words('english')
-stemmer = nltk.stem.porter.PorterStemmer()
+#cluster = AgglomerativeClustering(n_clusters=2, affinity='euclidean', linkage='ward')  
+#cluster.fit(processeddf) 
 
-def load_corpus(dir):
-    #dir is a directory with plain text files to load
-    corpus = nltk.corpus.PlaintextCorpusReader(dir, '.+\.txt', encoding='latin-1')
-    return corpus
-
-def corpus2docs(corpus):
-    #corpus is a object returned by load_corpus that represents a corpus
-    fids = corpus.fileids()
-    docs1 = []
-    for fid in fids:
-        doc_raw = corpus.raw(fid)
-        doc = nltk.word_tokenize(doc_raw) #tokenize words
-        docs1.append(doc)
-
-    docs2 = [[w.lower() for w in doc] for doc in docs1] #lowercase
-    docs3 = [[w for w in doc if re.search('^[a-z]+$', w)] for doc in docs2] #keep only alphabets
-    docs4 = [[w for w in doc if w not in stop_list] for doc in docs3] #remove stopwords
-    docs5 = [[stemmer.stem(w) for w in doc] for doc in docs4] #stemming
-    docs6 = [[w for w in doc if len(w) >= 3] for doc in docs5] #remove single and double letters
-
-    return docs6
-
-def docs2vecs(docs, dictionary):
-    #docs is a list of documents returned by corpus2docs
-    #dictionary is a gensim.corpora.Dictionary object
-    vecs1 = [dictionary.doc2bow(doc) for doc in docs]
-    tfidf = gensim.models.TfidfModel(vecs1) #TF-IDF
-    vecs2 = [tfidf[vec] for vec in vecs1]
-    return vecs2
-
-corpus = load_corpus('documents')
-docs = corpus2docs(corpus)
-dictionary = gensim.corpora.Dictionary(docs)
-vecs = docs2vecs(docs, dictionary)
-
-print(len(docs))
-
-num_tokens = len(dictionary.token2id)
-clusters = k_means.k_means(vecs, num_tokens, 13)
-
-#the below prints the file ids in each cluster
-fids = corpus.fileids()
-counter = 1
-
-for cluster in clusters:
-   print(counter, [fids[d] for d in cluster])
-   counter += 1
-
-#take all the file IDs in cluster1
-cluster1 = clusters[0]
-cluster1_fids = [fids[d] for d in cluster1]
-
-#create an empty list clust1_words =[]
-cluster1_all_words = []
-
-#add the words from all files to this list. Use corpus.words and extend method
-for fid in cluster1_fids:
-    cluster1_all_words.extend(corpus.words(fid))
-    
-#remove the Stopwords from this list
-stop_list = nltk.corpus.stopwords.words('english')
-
-all_words1 = [w.lower() for w in cluster1_all_words]
-all_words2 = [w for w in all_words1 if w not in stop_list and len(w)>3]
-
-#call freq distribution metod and display top 10 words or 20 words
-fdist = nltk.FreqDist(all_words2)
-print(fdist.most_common(10))
-'''
+Z = linkage(processeddf)
+plt.figure()
+dendrogram(Z)
+plt.show()
