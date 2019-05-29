@@ -9,6 +9,7 @@ graph = Graph(password = "1234") #neo4j database
 def get_index():
 	return render_template("index.html")
 
+#search for policies
 @app.route("/search", methods=["POST"])
 def search():
 	try:
@@ -42,8 +43,9 @@ def search():
 				results = [{"policy": {"name": "No Results Found!"}}]
 			)	
 
-@app.route("/get_people/<name>", methods=["GET"])
-def get_people(name):
+#search for all related items
+@app.route("/get_related/<name>", methods=["GET"])
+def get_related(name):
 	query = '''
 	MATCH (people:Person)-[relatedTo]-(:Policy {name: {name}}) 
 	RETURN people.name as name, Type(relatedTo) as relationship

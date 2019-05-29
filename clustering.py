@@ -1,4 +1,4 @@
-import nltk, re, k_means, gensim, os
+import nltk, re, k_means, gensim, os, pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
@@ -16,17 +16,18 @@ from sklearn.metrics.pairwise import cosine_similarity
 from scipy.cluster.hierarchy import dendrogram, linkage
 
 directory = os.getcwd() + '/documents2' #documents directory
-
 df = pd.DataFrame() #empty dataframe
+filenames = []
 
 for filename in os.listdir(directory):
     if filename.endswith(".txt"):
+        filenames.append(filename[:-4])
         df2 = pd.read_csv(directory + '/' + filename, sep="!", header=None, encoding='latin-1') #read text file into dataframe
         df = df.append(df2, ignore_index = True) #append dataframe
 
 columnName = 'text'
 df.columns = [columnName] #set column names
-print(df)
+
 listOfTokenizedWords = []
 for x in df[columnName]:
     tokenized_word = word_tokenize(x) #tokenize each row and save into dataframe
@@ -69,7 +70,17 @@ words_tfidf = vectorizer.fit_transform(stringOfTokenizedWords) #tfidf
 features = vectorizer.get_feature_names() #get list of features
 
 processeddf = pd.DataFrame(words_tfidf.toarray(), columns=features) #creating dataframe
+
+kmeans = KMeans(n_clusters=2, max_iter=1000).fit(processeddf)
+processeddf["clusters"] = kmeans.labels_
+processeddf["filename"] = filenames
+print(processeddf)
+
+processeddf.to_pickle("processeddf") #save to pickle
+
+'''
 processeddf2 = processeddf.copy()
+
 sse = {}
 for k in range(1, 3):
     kmeans = KMeans(n_clusters=k, max_iter=1000).fit(processeddf)
@@ -78,6 +89,7 @@ for k in range(1, 3):
     sse[k] = kmeans.inertia_ #inertia: Sum of distances of samples to their closest cluster center
 
 print(processeddf)
+
 plt.figure()
 plt.plot(list(sse.keys()), list(sse.values()))
 plt.xlabel("Number of cluster")
@@ -88,3 +100,4 @@ Z = linkage(processeddf2)
 plt.figure()
 dendrogram(Z)
 plt.show()
+'''

@@ -32,7 +32,7 @@
 			</tr>
 		  </thead>
 		  <tbody>
-			<tr onclick="get_people(this)" class="table-light" v-for="(row, index) in results">
+			<tr onclick="get_related(this)" class="table-light" v-for="(row, index) in results">
 			  <th scope="row">[[ index + 1 ]]</th>
 			  <td style="cursor: pointer;">[[ row.policy.name ]]</td>
 			</tr>
@@ -78,10 +78,10 @@
 			}
 		})
 
-		function get_people(element) {
+		function get_related(element) {
 			policyname = $(element).find('td:first').text();
 			document.getElementById("policyname").innerHTML = policyname; //set title
-			$.get('/get_people/' + policyname, function(data, status){
+			$.get('/get_related/' + policyname, function(data, status){
 				policyinforesults = data.results;
 
 				var list = document.getElementById('policyinfo'); //remove previous list
