@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.porter import *
 from nltk.stem import WordNetLemmatizer
 from nltk.probability import FreqDist
@@ -15,8 +15,7 @@ from pandas import DataFrame
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.cluster.hierarchy import dendrogram, linkage
 
-
-directory = os.getcwd() + '/documents' #documents directory
+directory = os.getcwd() + '/documents2' #documents directory
 
 df = pd.DataFrame() #empty dataframe
 
@@ -27,7 +26,7 @@ for filename in os.listdir(directory):
 
 columnName = 'text'
 df.columns = [columnName] #set column names
-
+print(df)
 listOfTokenizedWords = []
 for x in df[columnName]:
     tokenized_word = word_tokenize(x) #tokenize each row and save into dataframe
