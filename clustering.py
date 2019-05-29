@@ -69,24 +69,22 @@ words_tfidf = vectorizer.fit_transform(stringOfTokenizedWords) #tfidf
 features = vectorizer.get_feature_names() #get list of features
 
 processeddf = pd.DataFrame(words_tfidf.toarray(), columns=features) #creating dataframe
-
+processeddf2 = processeddf.copy()
 sse = {}
-for k in range(1, 30):
+for k in range(1, 3):
     kmeans = KMeans(n_clusters=k, max_iter=1000).fit(processeddf)
     processeddf["clusters"] = kmeans.labels_
     #print(processeddf["clusters"])
     sse[k] = kmeans.inertia_ #inertia: Sum of distances of samples to their closest cluster center
 
+print(processeddf)
 plt.figure()
 plt.plot(list(sse.keys()), list(sse.values()))
 plt.xlabel("Number of cluster")
 plt.ylabel("SSE")
 plt.show()
 
-#cluster = AgglomerativeClustering(n_clusters=2, affinity='euclidean', linkage='ward')  
-#cluster.fit(processeddf) 
-
-Z = linkage(processeddf)
+Z = linkage(processeddf2)
 plt.figure()
 dendrogram(Z)
 plt.show()
