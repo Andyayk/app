@@ -43,6 +43,8 @@
 		  <div class="card-body">
 			<h5 id="policyname" class="card-title">Policy Info</h5>
 			<p id="policyinfo" class="card-text"></p>
+			<br>
+			<p id="relatedinfo" class="card-text"></p>
 			<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
 		  </div>
 		</div>
@@ -107,13 +109,13 @@
 				policyinforesults = data.results;
 
 				if (policyinforesults != null) {
-					var p = document.createElement('p'); //create paragraph
-					var ul = document.createElement('ol'); //create list
-					
-					document.getElementById('policyinfo').appendChild(p); //append paragraph
-					document.getElementById('policyinfo').appendChild(ul); //append list
+					var ul = document.createElement('ul'); //create list
+					var ol = document.createElement('ol'); //create list
 
-					p.innerHTML = "<b>See results about</b>: "
+					document.getElementById('relatedinfo').appendChild(ul); //append list
+					document.getElementById('relatedinfo').appendChild(ol); //append list
+
+					ul.innerHTML = "<b>See results about</b>: "
 
 					for(var key in policyinforesults) {
 						name = policyinforesults[key];
@@ -121,7 +123,7 @@
 
 						for (var i = 0; i < names.length; i++) { 
 							var li = document.createElement('li');
-							ul.appendChild(li);
+							ol.appendChild(li);
 							li.innerHTML += names[i];
 						}
 					};
