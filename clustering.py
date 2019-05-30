@@ -2,7 +2,7 @@ import nltk, re, k_means, gensim, os, pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt 
-from sklearn.cluster import KMeans, AgglomerativeClustering
+from pandas import DataFrame
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.porter import *
@@ -11,8 +11,8 @@ from nltk.probability import FreqDist
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from sklearn.pipeline import Pipeline
 from sklearn import metrics
-from pandas import DataFrame
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.cluster import KMeans, AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
 
 directory = os.getcwd() + '/documents2' #documents directory
@@ -20,18 +20,18 @@ df = pd.DataFrame() #empty dataframe
 filenames = []
 
 for filename in os.listdir(directory):
-    if filename.endswith(".txt"):
-        filenames.append(filename[:-4])
-        df2 = pd.read_csv(directory + '/' + filename, sep="!", header=None, encoding='latin-1') #read text file into dataframe
-        df = df.append(df2, ignore_index = True) #append dataframe
+	if filename.endswith(".txt"):
+		filenames.append(filename[:-4])
+		df2 = pd.read_csv(directory + '/' + filename, sep="!", header=None, encoding='latin-1') #read text file into dataframe
+		df = df.append(df2, ignore_index = True) #append dataframe
 
 columnName = 'text'
 df.columns = [columnName] #set column names
 
 listOfTokenizedWords = []
 for x in df[columnName]:
-    tokenized_word = word_tokenize(x) #tokenize each row and save into dataframe
-    listOfTokenizedWords.append(tokenized_word)
+	tokenized_word = word_tokenize(x) #tokenize each row and save into dataframe
+	listOfTokenizedWords.append(tokenized_word)
 
 df[columnName] = listOfTokenizedWords #replace original words with tokenize words
 
@@ -45,7 +45,7 @@ df[columnName] = df[columnName].apply(lambda x: [y for y in x if re.search('^[a-
 stop_list = stopwords.words('english')
 stop_list += ['would', 'said', 'say', 'year', 'day', 'also', 'first', 'last', 'one', 'two', 'people', 'told', 'new', \
 'could', 'three', 'may', 'like', 'world', 'since', 'rt', 'http', 'https'] 
-           
+		   
 df[columnName] = df[columnName].apply(lambda x: [y for y in x if y not in stop_list])
 
 #stemming each tweet
@@ -61,8 +61,8 @@ processedWords = df[columnName].tolist()
 #rejoin the tokenize words into a sentence after preprocessing as count vectorizer need it to be a string
 stringOfTokenizedWords = []
 for x in processedWords:
-    sentence = (' '.join(x))
-    stringOfTokenizedWords.append(sentence)
+	sentence = (' '.join(x))
+	stringOfTokenizedWords.append(sentence)
 
 vectorizer = TfidfVectorizer(analyzer='word') #tfidf
 words_tfidf = vectorizer.fit_transform(stringOfTokenizedWords) #tfidf
@@ -83,10 +83,10 @@ processeddf2 = processeddf.copy()
 
 sse = {}
 for k in range(1, 3):
-    kmeans = KMeans(n_clusters=k, max_iter=1000).fit(processeddf)
-    processeddf["clusters"] = kmeans.labels_
-    #print(processeddf["clusters"])
-    sse[k] = kmeans.inertia_ #inertia: Sum of distances of samples to their closest cluster center
+	kmeans = KMeans(n_clusters=k, max_iter=1000).fit(processeddf)
+	processeddf["clusters"] = kmeans.labels_
+	#print(processeddf["clusters"])
+	sse[k] = kmeans.inertia_ #inertia: Sum of distances of samples to their closest cluster center
 
 print(processeddf)
 

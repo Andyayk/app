@@ -37,7 +37,7 @@ class ScrapyappPipeline(object):
 
 				person = Node("Person", name=personname) #creating a node
 				relationship = Relationship.type(relationshiptext) #changing it into a relationship type
-				graph.merge(relationship(person, policy), "Person", "name") #merging nodes with relationship
+				graph.merge(relationship(person, policy), "Node", "name") #merging nodes with relationship
 
 		elif isinstance(item, DocumentItem):
 			file = open(path + os.sep + item['policyname'] + ".txt","w") #saving data into text file

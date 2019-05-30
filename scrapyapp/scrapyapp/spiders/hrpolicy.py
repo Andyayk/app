@@ -5,7 +5,7 @@ from scrapyapp.items import HRPolicyRelationItem, DocumentItem
 """
 Useful commands:
 
-scrapy crawl jokes -o data.csv
+scrapy crawl hrpolicy -o data.csv
 scrapy shell "http://quotes.toscrape.com"
 
 """

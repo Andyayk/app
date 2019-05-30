@@ -1,4 +1,9 @@
-import json
+import json, nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.stem.porter import *
+from nltk.stem import WordNetLemmatizer
+from nltk.probability import FreqDist
 from flask import Flask, Response, json, jsonify, request, render_template
 from py2neo import Graph, Node, Relationship #neo4j
 
@@ -13,7 +18,15 @@ def get_index():
 @app.route("/search", methods=["POST"])
 def search():
 	try:
+		stop_list = stopwords.words('english')
+		stemmer = PorterStemmer()
+
 		q = request.json['query']
+		q2 = nltk.word_tokenize(q) #tokenize words
+		q3 = [w.lower() for w in q2] #lowercase
+		q4 = [w for w in q3 if re.search('^[a-z]+$', w)] #keep only alphabets
+		q5 = [stemmer.stem(w) for w in q4] #stemming
+
 	except KeyError:
 		return []
 	else:
@@ -30,9 +43,17 @@ def search():
 		LIMIT 1
 		'''		
 
+		q6 = ""
+		counter = 1
+		for word in q5:
+			q6 = q6 + word
+			if counter < len(q5):
+				q6 = q6 + "|"
+			counter += 1
+		
 		#get query that is case insensitive
-		results = graph.run(query, {"name": "(?i).*" + q + ".*"})
-		resultstest = graph.run(querytest, {"name": "(?i).*" + q + ".*"}) #checking if there are any results
+		results = graph.run(query, {"name": "(?i).*(" + q6 + ").*"})
+		resultstest = graph.run(querytest, {"name": "(?i).*(" + q6 + ").*"}) #checking if there are any results
 
 		if resultstest.evaluate(): #if there are results
 			return jsonify(
@@ -47,13 +68,13 @@ def search():
 @app.route("/get_related/<name>", methods=["GET"])
 def get_related(name):
 	query = '''
-	MATCH (people:Person)-[relatedTo]-(:Policy {name: {name}}) 
-	RETURN people.name as name, Type(relatedTo) as relationship
+	MATCH (node:Node)-[relatedTo]-(:Policy {name: {name}}) 
+	RETURN node.name as name, Type(relatedTo) as relationship
 	'''
 
 	querytest = '''
-	MATCH (people:Person)-[relatedTo]-(:Policy {name: {name}}) 
-	RETURN people.name as name, Type(relatedTo) as relationship 
+	MATCH (node:Node)-[relatedTo]-(:Policy {name: {name}}) 
+	RETURN node.name as name, Type(relatedTo) as relationship 
 	LIMIT 1
 	'''
 

@@ -8,7 +8,7 @@ def createRelationship(relatedtermname, policy):
 	relationshiptext = 'RELATED'
 	relatedterm = Node("RelatedTerm", name=relatedtermname) #creating a node
 	relationship = Relationship.type(relationshiptext) #changing it into a relationship type
-	graph.merge(relationship(relatedterm, policy), "Person", "name") #merging nodes with relationship
+	graph.merge(relationship(relatedterm, policy), "Node", "name") #merging nodes with relationship
 
 processeddf = pd.read_pickle("processeddf") #read pickle
 
