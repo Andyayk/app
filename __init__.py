@@ -31,15 +31,15 @@ def search():
 		return []
 	else:
 		query = '''
-		MATCH (policy:Policy)
-		WHERE policy.name =~ {name}
-		RETURN policy
+		MATCH (node:Policy)
+		WHERE node.name =~ {name}
+		RETURN node
 		'''
 
 		querytest = '''
-		MATCH (policy:Policy)
-		WHERE policy.name =~ {name}
-		RETURN policy
+		MATCH (node:Policy)
+		WHERE node.name =~ {name}
+		RETURN node
 		LIMIT 1
 		'''		
 
@@ -52,34 +52,37 @@ def search():
 			counter += 1
 		
 		#get query that is case insensitive
-		results = graph.run(query, {"name": "(?i).*(" + q6 + ").*"})
-		resultstest = graph.run(querytest, {"name": "(?i).*(" + q6 + ").*"}) #checking if there are any results
+		results = graph.run(query, parameters={"name": "(?i).*(" + q6 + ").*"})
+		resultstest = graph.run(querytest, parameters={"name": "(?i).*(" + q6 + ").*"}) #checking if there are any results
 
 		if resultstest.evaluate(): #if there are results
 			return jsonify(
-				results = [{"policy": dict(row["policy"])} for row in results]
+				results = [{"policy": dict(row["node"])} for row in results]
 			)
 		else:
 			return jsonify(
 				results = [{"policy": {"name": "No Results Found!"}}]
 			)	
 
-#search for all related items
-@app.route("/get_related/<name>", methods=["GET"])
-def get_related(name):
+#search for all related items of respective label
+@app.route("/get_related/", methods=["GET"])
+def get_related():
+	name  = request.args.get('name')
+	label  = request.args.get('label')
+
 	query = '''
-	MATCH (node:Node)-[relatedTo]-(:Policy {name: {name}}) 
+	MATCH (node:%s)-[relatedTo]-(:Policy {name: {name}}) 
 	RETURN node.name as name, Type(relatedTo) as relationship
-	'''
+	''' % (label) #string formatting
 
 	querytest = '''
-	MATCH (node:Node)-[relatedTo]-(:Policy {name: {name}}) 
+	MATCH (node:%s)-[relatedTo]-(:Policy {name: {name}}) 
 	RETURN node.name as name, Type(relatedTo) as relationship 
 	LIMIT 1
-	'''
+	''' % (label) #string formatting
 
-	results = graph.run(query, {"name": name})
-	resultstest = graph.run(querytest, {"name": name}) #checking if there are any results
+	results = graph.run(query, parameters={"name": name})
+	resultstest = graph.run(querytest, parameters={"name": name}) #checking if there are any results
 
 	dictionary = {}
 

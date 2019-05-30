@@ -81,7 +81,7 @@
 		function get_related(element) {
 			policyname = $(element).find('td:first').text();
 			document.getElementById("policyname").innerHTML = policyname; //set title
-			$.get('/get_related/' + policyname, function(data, status){
+			$.get('/get_related/?name=' + policyname + '&label=Person' , function(data, status){
 				policyinforesults = data.results;
 
 				var list = document.getElementById('policyinfo'); //remove previous list
@@ -90,7 +90,7 @@
 					}
 				if (policyinforesults != null) {
 					var ul = document.createElement('ul'); //create list
-					document.getElementById('policyinfo').appendChild(ul); //append to list
+					document.getElementById('policyinfo').appendChild(ul); //append list
 
 					for(var key in policyinforesults) {
 						name = policyinforesults[key];
@@ -102,6 +102,31 @@
 					};
 				};						
 			});
+
+			$.get('/get_related/?name=' + policyname + '&label=RelatedTerm' , function(data, status){
+				policyinforesults = data.results;
+
+				if (policyinforesults != null) {
+					var p = document.createElement('p'); //create paragraph
+					var ul = document.createElement('ol'); //create list
+					
+					document.getElementById('policyinfo').appendChild(p); //append paragraph
+					document.getElementById('policyinfo').appendChild(ul); //append list
+
+					p.innerHTML = "<b>See results about</b>: "
+
+					for(var key in policyinforesults) {
+						name = policyinforesults[key];
+						names = name.split(", ");
+
+						for (var i = 0; i < names.length; i++) { 
+							var li = document.createElement('li');
+							ul.appendChild(li);
+							li.innerHTML += names[i];
+						}
+					};
+				};						
+			});			
 		}		
 	</script>
 {% endblock %}

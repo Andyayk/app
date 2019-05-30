@@ -15,7 +15,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
 
-directory = os.getcwd() + '/documents2' #documents directory
+directory = os.getcwd() + '/documents' #documents directory
 df = pd.DataFrame() #empty dataframe
 filenames = []
 
@@ -72,23 +72,21 @@ features = vectorizer.get_feature_names() #get list of features
 processeddf = pd.DataFrame(words_tfidf.toarray(), columns=features) #creating dataframe
 
 kmeans = KMeans(n_clusters=2, max_iter=1000).fit(processeddf)
+'''
 processeddf["clusters"] = kmeans.labels_
 processeddf["filename"] = filenames
 print(processeddf)
 
 processeddf.to_pickle("processeddf") #save to pickle
-
 '''
 processeddf2 = processeddf.copy()
 
 sse = {}
-for k in range(1, 3):
+for k in range(1, 10):
 	kmeans = KMeans(n_clusters=k, max_iter=1000).fit(processeddf)
 	processeddf["clusters"] = kmeans.labels_
-	#print(processeddf["clusters"])
+	print(processeddf["clusters"])
 	sse[k] = kmeans.inertia_ #inertia: Sum of distances of samples to their closest cluster center
-
-print(processeddf)
 
 plt.figure()
 plt.plot(list(sse.keys()), list(sse.values()))
@@ -100,4 +98,3 @@ Z = linkage(processeddf2)
 plt.figure()
 dendrogram(Z)
 plt.show()
-'''
