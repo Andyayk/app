@@ -43,8 +43,8 @@ df[columnName] = df[columnName].apply(lambda x: [y for y in x if re.search('^[a-
 
 #remove stopwords
 stop_list = stopwords.words('english')
-stop_list += ['would', 'said', 'say', 'year', 'day', 'also', 'first', 'last', 'one', 'two', 'people', 'told', 'new', \
-'could', 'three', 'may', 'like', 'world', 'since', 'rt', 'http', 'https'] 
+#stop_list += ['would', 'said', 'say', 'year', 'day', 'also', 'first', 'last', 'one', 'two', 'people', 'told', 'new', \
+#'could', 'three', 'may', 'like', 'world', 'since', 'rt', 'http', 'https'] 
 		   
 df[columnName] = df[columnName].apply(lambda x: [y for y in x if y not in stop_list])
 
@@ -70,9 +70,9 @@ words_tfidf = vectorizer.fit_transform(stringOfTokenizedWords) #tfidf
 features = vectorizer.get_feature_names() #get list of features
 
 processeddf = pd.DataFrame(words_tfidf.toarray(), columns=features) #creating dataframe
-
-kmeans = KMeans(n_clusters=2, max_iter=1000).fit(processeddf)
 '''
+kmeans = KMeans(n_clusters=2, max_iter=1000).fit(processeddf)
+
 processeddf["clusters"] = kmeans.labels_
 processeddf["filename"] = filenames
 print(processeddf)
@@ -82,10 +82,10 @@ processeddf.to_pickle("processeddf") #save to pickle
 processeddf2 = processeddf.copy()
 
 sse = {}
-for k in range(1, 10):
+for k in range(2, 68):
 	kmeans = KMeans(n_clusters=k, max_iter=1000).fit(processeddf)
 	processeddf["clusters"] = kmeans.labels_
-	print(processeddf["clusters"])
+	#print(processeddf["clusters"])
 	sse[k] = kmeans.inertia_ #inertia: Sum of distances of samples to their closest cluster center
 
 plt.figure()
