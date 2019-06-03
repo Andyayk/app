@@ -41,13 +41,25 @@
 
 		<div class="card">
 		  <div class="card-body">
-			<h5 id="policyname" class="card-title">Policy Info</h5>
-			<p id="policyinfo" class="card-text"></p>
-			<br>
-			<p id="relatedinfo" class="card-text"></p>
-			<br>
-
-			<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
+			<h4 id="policyname" class="card-title">Policy Info</h4>
+			<div>
+				<ul>			
+					<li id="policyinfo" class="card-text" v-for="(value, key) in policyinfodata">
+						<b>[[ key.charAt(0).toUpperCase() + key.slice(1).toLowerCase() ]]</b>: [[ value ]]
+					</li>
+				</ul>
+			</div>
+			<div>
+				<h5>[[ topictitle ]]</h5>
+				<ol>
+					<li id="relatedinfo" class="card-text" v-for="(value) in relatedinfodata">
+						[[ value ]]
+					</li>
+				</ol>
+			</div>
+			<div>		
+				<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
+			</div>
 		  </div>
 		</div>
 		</template>
@@ -65,7 +77,7 @@
 		var searchbar = new Vue({
 			el: '#searchbar', //element name
 			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {query: '', results: '', showpolicytable: false},		
+			data: {query: '', results: '', showpolicytable: false, policyinfodata: '', relatedinfodata: '', topictitle: ''},		
 			methods: { // define methods under the `methods` object
 				search: function() { //search method
 					this.$http.post('/search', { //post request
@@ -85,56 +97,25 @@
 					document.getElementById("policyname").innerHTML = policyname; //set title
 					$.get('/get_related/?name=' + policyname + '&label=Person' , function(data, status){
 						policyinforesults = data.results;
-
-						var list = document.getElementById('policyinfo'); //remove previous list
-						while (list.hasChildNodes()) {
-							list.removeChild(list.firstChild);
-						}
-
 						if (policyinforesults != null) {
-							var ul = document.createElement('ul'); //create list
-							document.getElementById('policyinfo').appendChild(ul); //append list
-
-							for(var key in policyinforesults) {
-								name = policyinforesults[key];
-								relationship = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
-
-								var li = document.createElement('li');
-								ul.appendChild(li);
-								li.innerHTML += "<b>" + relationship + "</b>: " + name;
-							};
-						};						
-					});
-
+							this.policyinfodata = data.results;
+						} else {
+							this.policyinfodata = '';
+						}
+					}.bind(this));
+					
 					$.get('/get_related/?name=' + policyname + '&label=RelatedTerm' , function(data, status){
-						policyinforesults = data.results;
-
-						var list = document.getElementById('relatedinfo'); //remove previous list
-						while (list.hasChildNodes()) {
-							list.removeChild(list.firstChild);
-						}
-
-						if (policyinforesults != null) {
-							var ul = document.createElement('ul'); //create list
-							var ol = document.createElement('ol'); //create list
-
-							document.getElementById('relatedinfo').appendChild(ul); //append list
-							document.getElementById('relatedinfo').appendChild(ol); //append list
-
-							ul.innerHTML = "<b>Related Topics</b>: "
-
-							for(var key in policyinforesults) {
-								name = policyinforesults[key];
-								names = name.split(", ");
-
-								for (var i = 0; i < names.length; i++) { 
-									var li = document.createElement('li');
-									ol.appendChild(li);
-									li.innerHTML += names[i];
-								}
-							};
-						};						
-					});			
+						relatedinforesults = data.results;
+						if (relatedinforesults != null) {
+							value = relatedinforesults['RELATED'];
+							names = value.split(", ");
+							this.relatedinfodata = names;
+							this.topictitle = 'Related Topics';
+						} else {
+							this.relatedinfodata = '';
+							this.topictitle = '';
+						}		
+					}.bind(this));			
 				}					
 			}
 		})		
