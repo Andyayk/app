@@ -32,7 +32,7 @@
 			</tr>
 		  </thead>
 		  <tbody>
-			<tr onclick="get_related(this)" class="table-light" v-for="(row, index) in results">
+			<tr v-on:click="get_related" class="table-light" v-for="(row, index) in results">
 			  <th scope="row">[[ index + 1 ]]</th>
 			  <td style="cursor: pointer;">[[ row.policy.name ]]</td>
 			</tr>
@@ -45,6 +45,8 @@
 			<p id="policyinfo" class="card-text"></p>
 			<br>
 			<p id="relatedinfo" class="card-text"></p>
+			<br>
+
 			<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
 		  </div>
 		</div>
@@ -76,65 +78,65 @@
 					.catch(function (error) { //error callback
 						console.log(response.data);
 					});
-				}
-			}
-		})
+				},
+				get_related: function(e) { //get related method
+					var element = e.target; //retrieve element
+					policyname = $(element).text();
+					document.getElementById("policyname").innerHTML = policyname; //set title
+					$.get('/get_related/?name=' + policyname + '&label=Person' , function(data, status){
+						policyinforesults = data.results;
 
-		function get_related(element) {
-			policyname = $(element).find('td:first').text();
-			document.getElementById("policyname").innerHTML = policyname; //set title
-			$.get('/get_related/?name=' + policyname + '&label=Person' , function(data, status){
-				policyinforesults = data.results;
-
-				var list = document.getElementById('policyinfo'); //remove previous list
-				while (list.hasChildNodes()) {
-					list.removeChild(list.firstChild);
-				}
-
-				if (policyinforesults != null) {
-					var ul = document.createElement('ul'); //create list
-					document.getElementById('policyinfo').appendChild(ul); //append list
-
-					for(var key in policyinforesults) {
-						name = policyinforesults[key];
-						relationship = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
-
-						var li = document.createElement('li');
-						ul.appendChild(li);
-						li.innerHTML += "<b>" + relationship + "</b>: " + name;
-					};
-				};						
-			});
-
-			$.get('/get_related/?name=' + policyname + '&label=RelatedTerm' , function(data, status){
-				policyinforesults = data.results;
-
-				var list = document.getElementById('relatedinfo'); //remove previous list
-				while (list.hasChildNodes()) {
-					list.removeChild(list.firstChild);
-				}
-
-				if (policyinforesults != null) {
-					var ul = document.createElement('ul'); //create list
-					var ol = document.createElement('ol'); //create list
-
-					document.getElementById('relatedinfo').appendChild(ul); //append list
-					document.getElementById('relatedinfo').appendChild(ol); //append list
-
-					ul.innerHTML = "<b>Related Topics</b>: "
-
-					for(var key in policyinforesults) {
-						name = policyinforesults[key];
-						names = name.split(", ");
-
-						for (var i = 0; i < names.length; i++) { 
-							var li = document.createElement('li');
-							ol.appendChild(li);
-							li.innerHTML += names[i];
+						var list = document.getElementById('policyinfo'); //remove previous list
+						while (list.hasChildNodes()) {
+							list.removeChild(list.firstChild);
 						}
-					};
-				};						
-			});			
-		}		
+
+						if (policyinforesults != null) {
+							var ul = document.createElement('ul'); //create list
+							document.getElementById('policyinfo').appendChild(ul); //append list
+
+							for(var key in policyinforesults) {
+								name = policyinforesults[key];
+								relationship = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
+
+								var li = document.createElement('li');
+								ul.appendChild(li);
+								li.innerHTML += "<b>" + relationship + "</b>: " + name;
+							};
+						};						
+					});
+
+					$.get('/get_related/?name=' + policyname + '&label=RelatedTerm' , function(data, status){
+						policyinforesults = data.results;
+
+						var list = document.getElementById('relatedinfo'); //remove previous list
+						while (list.hasChildNodes()) {
+							list.removeChild(list.firstChild);
+						}
+
+						if (policyinforesults != null) {
+							var ul = document.createElement('ul'); //create list
+							var ol = document.createElement('ol'); //create list
+
+							document.getElementById('relatedinfo').appendChild(ul); //append list
+							document.getElementById('relatedinfo').appendChild(ol); //append list
+
+							ul.innerHTML = "<b>Related Topics</b>: "
+
+							for(var key in policyinforesults) {
+								name = policyinforesults[key];
+								names = name.split(", ");
+
+								for (var i = 0; i < names.length; i++) { 
+									var li = document.createElement('li');
+									ol.appendChild(li);
+									li.innerHTML += names[i];
+								}
+							};
+						};						
+					});			
+				}					
+			}
+		})		
 	</script>
 {% endblock %}
