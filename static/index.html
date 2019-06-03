@@ -87,9 +87,10 @@
 				policyinforesults = data.results;
 
 				var list = document.getElementById('policyinfo'); //remove previous list
-					while (list.hasChildNodes()) {
-						list.removeChild(list.firstChild);
-					}
+				while (list.hasChildNodes()) {
+					list.removeChild(list.firstChild);
+				}
+
 				if (policyinforesults != null) {
 					var ul = document.createElement('ul'); //create list
 					document.getElementById('policyinfo').appendChild(ul); //append list
@@ -107,6 +108,11 @@
 
 			$.get('/get_related/?name=' + policyname + '&label=RelatedTerm' , function(data, status){
 				policyinforesults = data.results;
+
+				var list = document.getElementById('relatedinfo'); //remove previous list
+				while (list.hasChildNodes()) {
+					list.removeChild(list.firstChild);
+				}
 
 				if (policyinforesults != null) {
 					var ul = document.createElement('ul'); //create list
