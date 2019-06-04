@@ -72,12 +72,12 @@ def get_related():
 
 	query = '''
 	MATCH (node:%s)-[relatedTo]-(:Policy {name: {name}}) 
-	RETURN node.name as name, Type(relatedTo) as relationship
+	RETURN node.name as name, Type(relatedTo) as relationship, node.text as text
 	''' % (label) #string formatting
 
 	querytest = '''
 	MATCH (node:%s)-[relatedTo]-(:Policy {name: {name}}) 
-	RETURN node.name as name, Type(relatedTo) as relationship 
+	RETURN node.name as name, Type(relatedTo) as relationship, node.text as text
 	LIMIT 1
 	''' % (label) #string formatting
 
@@ -85,17 +85,21 @@ def get_related():
 	resultstest = graph.run(querytest, parameters={"name": name}) #checking if there are any results
 
 	dictionary = {}
+	textlist = []
 
 	if resultstest.evaluate(): #if there are results
 		for row in results: #change into dictionary format
 			relationship = row["relationship"]
+			text = row['text']
+			textlist.append(text)
+
 			if relationship in dictionary:
 				dictionary[relationship] = dictionary[relationship] + ", " + row["name"]
 			else:
 				dictionary[relationship] = row["name"]
-
 		return jsonify(
-			results = dictionary
+			results = dictionary,
+			textlist = textlist
 		)
 	else:
 		return jsonify(

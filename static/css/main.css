@@ -93,3 +93,7 @@ a {
   display: block;
   cursor: pointer;
 }
+
+a:hover { 
+  background-color: #E0E0E0;
+}

@@ -42,6 +42,7 @@
 		<div class="card">
 		  <div class="card-body">
 			<h4 id="policyname" class="card-title">Policy Info</h4>
+			<hr color="black">
 			<div>
 				<ul>			
 					<li id="policyinfo" class="card-text" v-for="(value, key) in policyinfodata">
@@ -50,13 +51,13 @@
 				</ul>
 			</div>
 			<h5>[[ topictitle ]]</h5>
-			<br>
+			<hr color="black">
 			<div v-for="(value) in relatedinfodata">
 				<a @click="value.open = !value.open" v-text="value.name"></a>
-			<ul v-show="value.open">
-			  	<p v-for="item in value.items" v-text="item"></p>
-			</ul>
-			<hr>
+				<ul v-show="value.open">
+				  	<p style="font-size:12px;" v-for="item in value.items" v-text="item"></p>
+				</ul>
+				<hr>
 			</div>						
 			<div>		
 				<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
@@ -113,24 +114,28 @@
 					
 					$.get('/get_related/?name=' + policyname + '&label=RelatedTerm' , function(data, status){
 						relatedinforesults = data.results;
+						textlist = data.textlist;
+
 						if (relatedinforesults != null) {
 							value = relatedinforesults['RELATED'];
 							names = value.split(", ");
 
-							this.topictitle = 'Related Topics';
 							var list = [];
 							for (var i = 0; i < names.length; i++){
 								var name = {
 								    "name": names[i],
 								    "open": false,
 								    "items": [
-								      "item 1"
+								      textlist[i]
 								    ]
 								};
 								list.push(name);
-							}
+							};
+
 							this.relatedinfodata = list;
+							this.topictitle = 'Related Topics';
 						} else {
+							this.relatedinfodata = ''; //reset
 							this.topictitle = ''; //reset
 						}		
 					}.bind(this));			
