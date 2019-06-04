@@ -49,21 +49,22 @@
 					</li>
 				</ul>
 			</div>
-			<div>
-				<h5>[[ topictitle ]]</h5>
-				<ol>
-					<li id="relatedinfo" class="card-text" v-for="(value) in relatedinfodata">
-						[[ value ]]
-					</li>
-				</ol>
-			</div>
+			<h5>[[ topictitle ]]</h5>
+			<br>
+			<div v-for="(value) in relatedinfodata">
+				<a @click="value.open = !value.open" v-text="value.name"></a>
+			<ul v-show="value.open">
+			  	<p v-for="item in value.items" v-text="item"></p>
+			</ul>
+			<hr>
+			</div>						
 			<div>		
 				<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
 			</div>
 		  </div>
 		</div>
 		</template>
-	  </form>
+	  </form>	  
 	</div>
   </div>
 </div>
@@ -72,12 +73,18 @@
 
 {% block scripts %}
 	<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
-
 	<script>
 		var searchbar = new Vue({
 			el: '#searchbar', //element name
 			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {query: '', results: '', showpolicytable: false, policyinfodata: '', relatedinfodata: '', topictitle: ''},		
+			data: {
+				query: '', 
+				results: '', 
+				showpolicytable: false, 
+				policyinfodata: '', 
+				relatedinfodata: '', 
+				topictitle: ''
+			},		
 			methods: { // define methods under the `methods` object
 				search: function() { //search method
 					this.$http.post('/search', { //post request
@@ -100,7 +107,7 @@
 						if (policyinforesults != null) {
 							this.policyinfodata = data.results;
 						} else {
-							this.policyinfodata = '';
+							this.policyinfodata = ''; //reset
 						}
 					}.bind(this));
 					
@@ -109,11 +116,22 @@
 						if (relatedinforesults != null) {
 							value = relatedinforesults['RELATED'];
 							names = value.split(", ");
-							this.relatedinfodata = names;
+
 							this.topictitle = 'Related Topics';
+							var list = [];
+							for (var i = 0; i < names.length; i++){
+								var name = {
+								    "name": names[i],
+								    "open": false,
+								    "items": [
+								      "item 1"
+								    ]
+								};
+								list.push(name);
+							}
+							this.relatedinfodata = list;
 						} else {
-							this.relatedinfodata = '';
-							this.topictitle = '';
+							this.topictitle = ''; //reset
 						}		
 					}.bind(this));			
 				}					

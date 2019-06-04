@@ -88,3 +88,8 @@ header.masthead {
   padding-bottom:8rem
 
 }
+
+a {
+  display: block;
+  cursor: pointer;
+}
