@@ -97,10 +97,10 @@ processeddf["filename"] = filenames
 processeddf[columnName] = df2[columnName]
 print(processeddf[["filename","clusters"]])
 
-processeddf.to_pickle("processeddf") #save to pickle
+#processeddf.to_pickle("processeddf") #save to pickle
 """
 #hierarchical clustering
-Z = linkage(processeddf2)
+Z = linkage(processeddf2, method='weighted', metric='cosine')
 plt.figure()
 dendrogram(Z)
 plt.show()
