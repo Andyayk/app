@@ -1,0 +1,152 @@
+body{ 
+
+  position:relative;
+    
+  background:url(../img/bg-masthead2.jpg) no-repeat center center;
+    
+  background-size:cover;
+    
+  padding-top:8rem;
+    
+  padding-bottom:8rem
+
+}
+
+
+
+.container{
+
+  height: 100%;
+
+  align-content: center;
+
+}
+
+
+
+.card{
+
+  height: 370px;
+
+  margin-top: auto;
+
+  margin-bottom: auto;
+
+  width: 400px;
+
+  background-color: rgba(46, 49, 49, 0.5) !important;
+
+}
+
+
+
+.social_icon span{
+
+  font-size: 60px;
+
+  margin-left: 10px;
+
+  color: #007bff;
+
+}
+
+
+
+.social_icon span:hover{
+
+  color: white;
+
+  cursor: pointer;
+
+}
+
+
+
+.card-header h3{
+
+  color: white;
+
+}
+
+
+
+.social_icon{
+
+  position: absolute;
+
+  right: 20px;
+
+  top: -45px;
+
+}
+
+
+
+.input-group-prepend span{
+
+  width: 50px;
+
+  background-color: #007bff;
+
+  color: black;
+
+  border:0 !important;
+
+}
+
+
+
+input:focus{
+
+  outline: 0 0 0 0  !important;
+
+  box-shadow: 0 0 0 0 !important;
+
+
+}
+
+
+
+.remember{
+
+  color: white;
+
+}
+
+
+
+.remember input
+{
+
+  width: 20px;
+
+  height: 20px;
+
+  margin-left: 15px;
+
+  margin-right: 5px;
+
+}
+
+
+
+.btn-primary{
+
+  width: 100px;
+
+}
+
+
+.links{
+
+  color: white;
+
+}
+
+
+
+.links a{
+
+  margin-left: 4px;
+
+}

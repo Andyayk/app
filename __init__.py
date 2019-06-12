@@ -6,12 +6,18 @@ from nltk.stem import WordNetLemmatizer
 from nltk.probability import FreqDist
 from flask import Flask, Response, json, jsonify, request, render_template
 from py2neo import Graph, Node, Relationship #neo4j
+from flask_login import LoginManager
 
 app = Flask(__name__, static_folder='static', template_folder='static')
 graph = Graph(password = "1234") #neo4j database
+login = LoginManager(app) #flask login
 
 @app.route("/", methods=["GET"])
-def get_index():
+def loginpage():
+	return render_template("login.html")
+
+@app.route("/homepage", methods=["GET"])
+def homepage():
 	return render_template("index.html")
 
 #search for policies
