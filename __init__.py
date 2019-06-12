@@ -44,8 +44,14 @@ def homepage():
 #login the user
 @app.route("/login", methods=["POST"])
 def login():
-	login_user(User(1))
-	return redirect(url_for('homepage'))
+	username = request.form.get('username')
+	password = request.form.get('password')
+
+	if username == "a" and password == "a":
+		login_user(User(1))
+		return redirect(url_for('homepage'))
+	else:
+		return render_template("login.html", error="Incorrect Username/Password!")
 
 #logout the user
 @app.route('/logout')

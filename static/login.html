@@ -41,19 +41,20 @@
 				</div>
 			</div>
 			<div class="card-body">
+				<b><font color="red">{{ error }}</font></b>
 				<form action="/login" method="POST">
 					<div class="input-group form-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-user"></i></span>
 						</div>
-						<input type="text" class="form-control" placeholder="username" required>
+						<input name="username" type="text" class="form-control" placeholder="username" required>
 						
 					</div>
 					<div class="input-group form-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-key"></i></span>
 						</div>
-						<input type="password" class="form-control" placeholder="password" required>
+						<input name="password" type="password" class="form-control" placeholder="password" required>
 					</div>
 					<div class="row align-items-center remember">
 						<input type="checkbox">Remember Me
