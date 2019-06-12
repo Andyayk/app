@@ -6,51 +6,53 @@ from nltk.stem import WordNetLemmatizer
 from nltk.probability import FreqDist
 from flask import Flask, Response, json, jsonify, request, render_template, redirect, url_for
 from py2neo import Graph, Node, Relationship #neo4j
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 
 app = Flask(__name__, static_folder='static', template_folder='static')
+app.config['SECRET_KEY'] = "a153246s35746d57f68g9uedtrfyughi98cyas"
 graph = Graph(password = "1234") #neo4j database
 
 login_manager = LoginManager() #flask login
 login_manager.init_app(app)
 
-#login page
-@app.route("/", methods=["GET"])
-def loginpage():
-	return render_template("login.html")
-
-#home page
-@app.route("/homepage", methods=["GET"])
-def homepage():
-	if not current_user.is_authenticated:
-		return redirect(url_for('login_r'))
-	else:
-		return render_template("index.html")
+class User(UserMixin):
+  def __init__(self,id):
+    self.id = id
 
 #default user loader
 @login_manager.user_loader
 def load_user(user_id):
-	return User.query.filter_by(id=user_id).first()
+    return User(user_id)
 
-#default render
-@app.route('/login')
-def login_r():
+#login page
+@app.route("/", methods=["GET"])
+@app.route("/loginpage", methods=["GET"])
+def loginpage():
 	if current_user.is_authenticated:
-		return redirect('/')
+		return render_template("index.html")
 	else:
-		return render_template('login.html')
+		return render_template("login.html")
+
+#home page
+@app.route("/homepage", methods=["GET"])
+def homepage():
+	if current_user.is_authenticated:
+		return render_template("index.html")
+	else:
+		return render_template("login.html")
 
 #login the user
-@app.route("/login_api", methods=["POST"])
-def login_api():
-	login_user(user)
-	return render_template("login.html")
+@app.route("/login", methods=["POST"])
+def login():
+	login_user(User(1))
+	return redirect(url_for('homepage'))
 
 #logout the user
-@app.route('/logout_api')
-def logout_api():
+@app.route('/logout')
+@login_required
+def logout():
 	logout_user()
-	return redirect(url_for('login_r'))
+	return redirect(url_for('loginpage'))
 
 #search for policies
 @app.route("/search", methods=["POST"])
