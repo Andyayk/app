@@ -4,21 +4,53 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.stem.porter import *
 from nltk.stem import WordNetLemmatizer
 from nltk.probability import FreqDist
-from flask import Flask, Response, json, jsonify, request, render_template
+from flask import Flask, Response, json, jsonify, request, render_template, redirect, url_for
 from py2neo import Graph, Node, Relationship #neo4j
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 app = Flask(__name__, static_folder='static', template_folder='static')
 graph = Graph(password = "1234") #neo4j database
-login = LoginManager(app) #flask login
 
+login_manager = LoginManager() #flask login
+login_manager.init_app(app)
+
+#login page
 @app.route("/", methods=["GET"])
 def loginpage():
 	return render_template("login.html")
 
+#home page
 @app.route("/homepage", methods=["GET"])
 def homepage():
-	return render_template("index.html")
+	if not current_user.is_authenticated:
+		return redirect(url_for('login_r'))
+	else:
+		return render_template("index.html")
+
+#default user loader
+@login_manager.user_loader
+def load_user(user_id):
+	return User.query.filter_by(id=user_id).first()
+
+#default render
+@app.route('/login')
+def login_r():
+	if current_user.is_authenticated:
+		return redirect('/')
+	else:
+		return render_template('login.html')
+
+#login the user
+@app.route("/login_api", methods=["POST"])
+def login_api():
+	login_user(user)
+	return render_template("login.html")
+
+#logout the user
+@app.route('/logout_api')
+def logout_api():
+	logout_user()
+	return redirect(url_for('login_r'))
 
 #search for policies
 @app.route("/search", methods=["POST"])
