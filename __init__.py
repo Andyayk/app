@@ -16,49 +16,49 @@ login_manager = LoginManager() #flask login
 login_manager.init_app(app)
 
 class User(UserMixin):
-  def __init__(self,id):
-    self.id = id
+	def __init__(self,id):
+		self.id = id
 
 #default user loader
 @login_manager.user_loader
 def load_user(user_id):
-    return User(user_id)
+	return User(user_id)
 
 #login page
-@app.route("/", methods=["GET"])
-@app.route("/loginpage", methods=["GET"])
-def loginpage():
+@app.route('/')
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+	error = None
+   
+	if request.method == 'POST':
+		username = request.form.get('username') #get username
+		password = request.form.get('password') #get password
+
+		if username == "a" and password == "a":
+			login_user(User(1))
+			return redirect(url_for('homepage'))
+		else:
+			error = "Incorrect Username/Password!"
+
 	if current_user.is_authenticated:
 		return render_template("index.html")
 	else:
-		return render_template("login.html")
+		return render_template('login.html', error = error)
 
 #home page
-@app.route("/homepage", methods=["GET"])
+@app.route("/homepage")
 def homepage():
 	if current_user.is_authenticated:
 		return render_template("index.html")
 	else:
 		return render_template("login.html")
 
-#login the user
-@app.route("/login", methods=["POST"])
-def login():
-	username = request.form.get('username')
-	password = request.form.get('password')
-
-	if username == "a" and password == "a":
-		login_user(User(1))
-		return redirect(url_for('homepage'))
-	else:
-		return render_template("login.html", error="Incorrect Username/Password!")
-
 #logout the user
 @app.route('/logout')
 @login_required
 def logout():
 	logout_user()
-	return redirect(url_for('loginpage'))
+	return redirect(url_for('login'))
 
 #search for policies
 @app.route("/search", methods=["POST"])

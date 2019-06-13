@@ -41,7 +41,9 @@
 				</div>
 			</div>
 			<div class="card-body">
-				<b><font color="red">{{ error }}</font></b>
+				{% if error %}
+				<p><font color="white"><strong>Error:</strong> {{ error }}</font></p>
+				{% endif %}
 				<form action="/login" method="POST">
 					<div class="input-group form-group">
 						<div class="input-group-prepend">
@@ -75,5 +77,10 @@
 		</div>
 	</div>
 </div>
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
 </body>
 </html>
