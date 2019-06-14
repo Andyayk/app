@@ -1,0 +1,62 @@
+body{ 
+
+  position:relative;
+    
+  background:url(../img/bg-masthead2.jpg) no-repeat center center;
+    
+  background-size:cover;
+    
+  padding-top:8rem;
+    
+  padding-bottom:8rem
+
+}
+
+
+.container{
+
+  height: 100%;
+
+  align-content: center;
+
+}
+
+
+.card{
+
+  height: 520px;
+
+  margin-top: auto;
+
+  margin-bottom: auto;
+
+  width: 400px;
+
+  background-color: rgba(46, 49, 49, 0.5) !important;
+
+}
+
+
+.card-body{
+  color: white;
+}
+
+
+input:focus{
+
+  outline: 0 0 0 0  !important;
+
+  box-shadow: 0 0 0 0 !important;
+
+
+}
+
+input[type="date"]:before {
+  content: attr(placeholder) !important;
+  color: #636c72;
+  margin-right: 0.5em;
+}
+
+input[type="date"]:focus:before, input[type="date"]:valid:before {
+  content: "";
+}

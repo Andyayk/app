@@ -28,22 +28,31 @@ def load_user(user_id):
 @app.route('/')
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
-	error = None
+	message = None
    
 	if request.method == 'POST':
 		username = request.form.get('username') #get username
 		password = request.form.get('password') #get password
 
-		if username == "a" and password == "a":
-			login_user(User(1))
+		query = '''
+				MATCH (node:Policy)
+				WHERE node.name =~ {name}
+				RETURN node
+				'''
+
+		#get query
+		results = graph.run(query, parameters={"name": username})
+
+		if results.evaluate(): #if there are results
+			login_user(User(username)) #login user
 			return redirect(url_for('homepage'))
 		else:
-			error = "Incorrect Username/Password!"
+			message = "Incorrect Username/Password!" #message
 
-	if current_user.is_authenticated:
+	if current_user.is_authenticated: #redirect user
 		return render_template("index.html")
 	else:
-		return render_template('login.html', error = error)
+		return render_template('login.html', message = message)
 
 #home page
 @app.route("/homepage")
@@ -52,6 +61,33 @@ def homepage():
 		return render_template("index.html")
 	else:
 		return render_template("login.html")
+
+#register page
+@app.route("/register", methods = ['GET', 'POST'])
+def register():
+	message = None
+	if request.method == 'POST':
+		username = request.form.get('username') #get username
+		email = request.form.get('email') #get email
+		dateofbirth = request.form.get('dateofbirth') #get date of birth
+		jobtype = request.form.get('jobtype') #get job type
+		datejoined = request.form.get('datejoined') #get date joined
+		password = request.form.get('password') #get password
+
+		print(username)
+		print(email)
+		print(dateofbirth)
+		print(jobtype)
+		print(datejoined)
+		print(password)
+
+		message = "Registered successfully. Please login!" #message
+		return render_template('login.html', message = message)
+
+	if current_user.is_authenticated: #redirect user
+		return render_template("index.html")
+	else:
+		return render_template("register.html")
 
 #logout the user
 @app.route('/logout')

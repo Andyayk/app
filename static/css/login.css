@@ -26,7 +26,7 @@ body{
 
 .card{
 
-  height: 370px;
+  height: 390px;
 
   margin-top: auto;
 
@@ -77,20 +77,6 @@ body{
   right: 20px;
 
   top: -45px;
-
-}
-
-
-
-.input-group-prepend span{
-
-  width: 50px;
-
-  background-color: #007bff;
-
-  color: black;
-
-  border:0 !important;
 
 }
 
