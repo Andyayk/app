@@ -16,13 +16,21 @@ login_manager = LoginManager() #flask login
 login_manager.init_app(app)
 
 class User(UserMixin):
-	def __init__(self,id):
-		self.id = id
+	def __init__(self, username, email, dateofbirth, jobtype, datejoined):
+		self.username = username
+		self.email = email
+		self.dateofbirth = dateofbirth
+		self.jobtype = jobtype
+		self.datejoined = datejoined
 
 #default user loader
 @login_manager.user_loader
-def load_user(user_id):
-	return User(user_id)
+def load_user(username):
+	email = 'a'
+	dateofbirth = 'b'
+	jobtype = 'c'
+	datejoined = 'd'
+	return User(username, email, dateofbirth, jobtype, datejoined)
 
 #login page
 @app.route('/')
@@ -34,16 +42,15 @@ def login():
 		username = request.form.get('username') #get username
 		password = request.form.get('password') #get password
 
-		query = '''
-				MATCH (node:Policy)
-				WHERE node.name =~ {name}
-				RETURN node
-				'''
+		querytest = '''
+		MATCH (node:User)
+		WHERE node.username =~ {name}
+		RETURN node
+		'''	
 
-		#get query
-		results = graph.run(query, parameters={"name": username})
+		resultstest = graph.run(querytest, parameters={"name": username}) #checking if there are any results
 
-		if results.evaluate(): #if there are results
+		if resultstest.evaluate(): #if there are results
 			login_user(User(username)) #login user
 			return redirect(url_for('homepage'))
 		else:
@@ -74,15 +81,32 @@ def register():
 		datejoined = request.form.get('datejoined') #get date joined
 		password = request.form.get('password') #get password
 
-		print(username)
-		print(email)
-		print(dateofbirth)
-		print(jobtype)
-		print(datejoined)
-		print(password)
+		query = '''
+				MATCH (node:User)
+				WHERE node.username =~ {name}
+				RETURN node
+				'''
 
-		message = "Registered successfully. Please login!" #message
-		return render_template('login.html', message = message)
+		querytest = '''
+		MATCH (node:User)
+		WHERE node.username =~ {name}
+		RETURN node
+		'''		
+
+		#get query
+		results = graph.run(query, parameters={"name": username})				
+		resultstest = graph.run(querytest, parameters={"name": username}) #checking if there are any results
+
+		if resultstest.evaluate(): #if there are results, user exists
+			message = "Username already exists, please try again!"
+
+			return render_template('register.html', message = message)
+		else: #username doesn't exist
+			user = Node("User", username=username, email=email, dateofbirth=dateofbirth, jobtype=jobtype, datejoined=datejoined, password=password) #creating respective user node
+			graph.create(user)
+
+			message = "Registered successfully. Please login!" #message
+			return render_template('login.html', message = message)
 
 	if current_user.is_authenticated: #redirect user
 		return render_template("index.html")

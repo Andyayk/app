@@ -19,10 +19,13 @@
 <body>
 <div class="container">
 	<div class="d-flex justify-content-center h-100">
-		<div class="card">			
-			<article class="card-body mx-auto" style="max-width: 400px;">
+		<div class="card">					
+			<article class="card-body mx-auto" style="max-width: 400px;">				
 				<h4 class="card-title text-center">Create Account</h4>
 				<p class="text-center">Get started with your free account</p>
+				{% if message %}
+				<p><font color="white"><strong>{{ message }}</strong></font></p>
+				{% endif %}					
 				<form action="/register" method="POST">
 				<div class="form-group input-group">
 					<div class="input-group-prepend">
@@ -52,7 +55,7 @@
 						<option>Manager</option>
 						<option>Accounting</option>
 					</select>
-				</div> <!-- form-group end.// -->
+				</div> <!-- form-group end.// -->				
 				<div class="form-group input-group">
 					<div class="input-group-prepend">
 					    <span class="input-group-text"> <i class="fa fa-user"></i> </span>
@@ -75,5 +78,10 @@
 	</div>
 </div> 
 <!--container end.//-->
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
 </body>
 </html>
