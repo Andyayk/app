@@ -16,21 +16,14 @@ login_manager = LoginManager() #flask login
 login_manager.init_app(app)
 
 class User(UserMixin):
-	def __init__(self, username, email, dateofbirth, jobtype, datejoined):
-		self.username = username
+	def __init__(self, username, email):
+		self.id = username
 		self.email = email
-		self.dateofbirth = dateofbirth
-		self.jobtype = jobtype
-		self.datejoined = datejoined
 
 #default user loader
 @login_manager.user_loader
 def load_user(username):
-	email = 'a'
-	dateofbirth = 'b'
-	jobtype = 'c'
-	datejoined = 'd'
-	return User(username, email, dateofbirth, jobtype, datejoined)
+	return User(username, 'a')
 
 #login page
 @app.route('/')
@@ -42,16 +35,18 @@ def login():
 		username = request.form.get('username') #get username
 		password = request.form.get('password') #get password
 
-		querytest = '''
-		MATCH (node:User)
-		WHERE node.username =~ {name}
-		RETURN node
-		'''	
+		query = '''
+				MATCH (node:User)
+				WHERE node.username =~ {name}
+				RETURN node
+				'''
 
-		resultstest = graph.run(querytest, parameters={"name": username}) #checking if there are any results
+		#get query
+		results = graph.run(query, parameters={"name": username})
 
-		if resultstest.evaluate(): #if there are results
-			login_user(User(username)) #login user
+		if results.evaluate(): #if there are results
+			user = load_user(username) #create user
+			login_user(user) #login user
 			return redirect(url_for('homepage'))
 		else:
 			message = "Incorrect Username/Password!" #message
