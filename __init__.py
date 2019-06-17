@@ -17,12 +17,12 @@ login_manager.init_app(app) #initialise app
 
 #user class
 class User(UserMixin):
-	def __init__(self, username, email, dateofbirth, jobtype, datejoined):
+	def __init__(self, username, email, dateofbirth, jobtype, dateofhire):
 		self.id = username
 		self.email = email
 		self.dateofbirth = dateofbirth
 		self.jobtype = jobtype
-		self.datejoined = datejoined
+		self.dateofhire = dateofhire
 
 #default user loader
 @login_manager.user_loader
@@ -30,12 +30,12 @@ def load_user(username):
 	email = None
 	dateofbirth = None
 	jobtype = None
-	datejoined = None
+	dateofhire = None
 
 	query = '''
 			MATCH (node:User)
 			WHERE node.username =~ {name}
-			RETURN node.email as email, node.dateofbirth as dateofbirth, node.jobtype as jobtype, node.datejoined as datejoined 
+			RETURN node.email as email, node.dateofbirth as dateofbirth, node.jobtype as jobtype, node.dateofhire as dateofhire 
 			'''
 
 	#get query
@@ -45,9 +45,9 @@ def load_user(username):
 		email = row['email']
 		dateofbirth = row['dateofbirth']
 		jobtype = row['jobtype']
-		datejoined = row['datejoined']	
+		dateofhire = row['dateofhire']	
 
-	return User(username, email, dateofbirth, jobtype, datejoined)
+	return User(username, email, dateofbirth, jobtype, dateofhire)
 
 #login page
 @app.route('/')
@@ -108,7 +108,7 @@ def register():
 		email = request.form.get('email') #get email
 		dateofbirth = request.form.get('dateofbirth') #get date of birth
 		jobtype = request.form.get('jobtype') #get job type
-		datejoined = request.form.get('datejoined') #get date joined
+		dateofhire = request.form.get('dateofhire') #get date of hire
 		password = request.form.get('password') #get password
 
 		query = '''
@@ -132,7 +132,7 @@ def register():
 
 			return render_template('register.html', message = message)
 		else: #username doesn't exist
-			user = Node("User", username=username, email=email, dateofbirth=dateofbirth, jobtype=jobtype, datejoined=datejoined, password=password) #creating respective user node
+			user = Node("User", username=username, email=email, dateofbirth=dateofbirth, jobtype=jobtype, dateofhire=dateofhire, password=password) #creating respective user node
 			graph.create(user)
 
 			message = "Registered successfully. Please login!" #message
