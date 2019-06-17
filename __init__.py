@@ -8,22 +8,46 @@ from flask import Flask, Response, json, jsonify, request, render_template, redi
 from py2neo import Graph, Node, Relationship #neo4j
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 
-app = Flask(__name__, static_folder='static', template_folder='static')
-app.config['SECRET_KEY'] = "a153246s35746d57f68g9uedtrfyughi98cyas"
+app = Flask(__name__, static_folder='static', template_folder='static') #static folder
+app.config['SECRET_KEY'] = "a153246s35746d57f68g9uedtrfyughi98cyas" #secret key
 graph = Graph(password = "1234") #neo4j database
 
 login_manager = LoginManager() #flask login
-login_manager.init_app(app)
+login_manager.init_app(app) #initialise app
 
+#user class
 class User(UserMixin):
-	def __init__(self, username, email):
+	def __init__(self, username, email, dateofbirth, jobtype, datejoined):
 		self.id = username
 		self.email = email
+		self.dateofbirth = dateofbirth
+		self.jobtype = jobtype
+		self.datejoined = datejoined
 
 #default user loader
 @login_manager.user_loader
 def load_user(username):
-	return User(username, 'a')
+	email = None
+	dateofbirth = None
+	jobtype = None
+	datejoined = None
+
+	query = '''
+			MATCH (node:User)
+			WHERE node.username =~ {name}
+			RETURN node.email as email, node.dateofbirth as dateofbirth, node.jobtype as jobtype, node.datejoined as datejoined 
+			'''
+
+	#get query
+	results = graph.run(query, parameters={"name": username})
+
+	for row in results:
+		email = row['email']
+		dateofbirth = row['dateofbirth']
+		jobtype = row['jobtype']
+		datejoined = row['datejoined']	
+
+	return User(username, email, dateofbirth, jobtype, datejoined)
 
 #login page
 @app.route('/')
@@ -38,16 +62,27 @@ def login():
 		query = '''
 				MATCH (node:User)
 				WHERE node.username =~ {name}
-				RETURN node
+				RETURN node.password as password
 				'''
+
+		querytest = '''
+		MATCH (node:User)
+		WHERE node.username =~ {name}
+		RETURN node.password as password
+		'''		
 
 		#get query
 		results = graph.run(query, parameters={"name": username})
+		resultstest = graph.run(querytest, parameters={"name": username}) #checking if there are any results
 
-		if results.evaluate(): #if there are results
-			user = load_user(username) #create user
-			login_user(user) #login user
-			return redirect(url_for('homepage'))
+		if resultstest.evaluate(): #if there are results
+			for row in results:
+				if row['password'] == password:
+					user = load_user(username) #create user
+					login_user(user) #login user
+					return redirect(url_for('homepage'))
+				else:
+					message = "Incorrect Username/Password!" #message
 		else:
 			message = "Incorrect Username/Password!" #message
 
@@ -205,52 +240,4 @@ def get_related():
 	else:
 		return jsonify(
 			results = None
-		)	
-
-"""
-@app.route("/graph", methods=["GET"])
-def get_graph():
-	query = '''
-	MATCH (m:Movie)<-[:ACTED_IN]-(a:Person)
-	RETURN m.title as movie, collect(a.name) as cast
-	LIMIT {limit}
-	'''
-
-	results = graph.run(query, {"limit": 100})
-	nodes = []
-	rels = []
-
-	i = 0
-	for movie, cast in results:
-		nodes.append({"title": movie, "label": "movie"})
-		target = i
-		i += 1
-
-		for name in cast:
-			actor = {"title": name, "label": "actor"}
-			try:
-				source = nodes.index(actor)
-			except ValueError:
-				nodes.append(actor)
-				source = i
-				i += 1
-			rels.append({"source": source, "target": target})
-			
-	return jsonify({"nodes": nodes, "links": rels})
-
-@app.route("/movie/<title>", methods=["GET"])
-def get_movie(title):
-	query = '''
-	MATCH (movie:Movie {title:{title}})
-	OPTIONAL MATCH (movie)<-[r]-(person:Person)
-	RETURN movie.title as title,
-	collect([person.name, head(split(lower(type(r)),'_')), r.roles]) as cast
-	LIMIT 1
-	'''
-
-	results = graph.run(query, {"title": title})
-	row = results.next()
-
-	return jsonify({"title": row["title"],
-			"cast": [dict(zip(("name", "job", "role"), member)) for member in row["cast"]]})
-"""
+		)
