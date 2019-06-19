@@ -15,6 +15,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
 
+#K-Means Clustering
+
 directory = os.getcwd() + '/documents2' #documents directory
 df = pd.DataFrame() #empty dataframe
 filenames = []

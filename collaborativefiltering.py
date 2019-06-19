@@ -5,17 +5,15 @@ from sklearn.metrics import pairwise_distances
 
 #User-Based Collaborative Filtering
 
-movies = pd.read_csv("movies.csv",encoding="Latin1")
-Ratings = pd.read_csv("ratings.csv")
+policies = pd.read_csv("policies.csv", encoding="Latin1") #read csv to dataframe
+searches = pd.read_csv("searches.csv") #read csv to dataframe
 
-#calculating the normalized rating
-Mean = Ratings.groupby(by="userId", as_index=False)['rating'].mean()
-Rating_avg = pd.merge(Ratings, Mean, on='userId')
-Rating_avg['adg_rating'] = Rating_avg['rating_x'] - Rating_avg['rating_y']
+mean = searches.groupby(by="userId", as_index=False)['numsearch'].mean() #calculating the mean search for each user
+search_avg = pd.merge(searches, mean, on='userId')
+search_avg['adg_search'] = search_avg['numsearch_x'] - search_avg['numsearch_y']
 
-check = pd.pivot_table(Rating_avg, values='rating_x', index='userId', columns='movieId')
-
-final = pd.pivot_table(Rating_avg, values='adg_rating', index='userId', columns='movieId')
+check = pd.pivot_table(search_avg, values='numsearch_x', index='userId', columns='policyId')
+final = pd.pivot_table(search_avg, values='adg_search', index='userId', columns='policyId')
 
 #replacing NaN by Movie Average
 final_movie = final.fillna(final.mean(axis=0))
@@ -29,7 +27,7 @@ np.fill_diagonal(b, 0) #fill diagonal with zeros
 similarity_with_user = pd.DataFrame(b, index=final_user.index)
 similarity_with_user.columns = final_user.index
 
-#user similarity on replacing NaN by item(movie) avg
+#user similarity on replacing NaN by item(policies) avg
 cosine = cosine_similarity(final_movie)
 np.fill_diagonal(cosine, 0) #fill diagonal with zeros
 similarity_with_movie = pd.DataFrame(cosine, index=final_movie.index)
@@ -37,11 +35,11 @@ similarity_with_movie.columns = final_user.index
 
 """
 def get_user_similar_movies(user1, user2):
-	common_movies = Rating_avg[Rating_avg.userId == user1].merge(
-	Rating_avg[Rating_avg.userId == user2],
-	on = "movieId",
+	common_movies = search_avg[search_avg.userId == user1].merge(
+	search_avg[search_avg.userId == user2],
+	on = "policyId",
 	how = "inner" )
-	return common_movies.merge( movies, on = 'movieId' )
+	return common_movies.merge( policies, on = 'policyId' )
 
 a = get_user_similar_movies(370, 86309)
 a = a.loc[ : , ['rating_x_x', 'rating_x_y', 'title']]
@@ -55,10 +53,10 @@ def find_n_neighbours(df, n):
 	return df
 
 #top 30 neighbours for each user
-sim_user_30_u = find_n_neighbours(similarity_with_user, 30)
+sim_user_30_u = find_n_neighbours(similarity_with_user, 2)
 
 #top 30 neighbours for each user
-sim_user_30_m = find_n_neighbours(similarity_with_movie, 30)
+sim_user_30_m = find_n_neighbours(similarity_with_movie, 2)
 
 """
 def User_item_score(user, item):
@@ -67,7 +65,7 @@ def User_item_score(user, item):
 	c = final_movie.loc[:,item]
 	d = c[c.index.isin(b)]
 	f = d[d.notnull()]
-	avg_user = Mean.loc[Mean['userId'] == user,'rating'].values[0]
+	avg_user = mean.loc[mean['userId'] == user,'numsearch'].values[0]
 	index = f.index.values.squeeze().tolist()
 	corr = similarity_with_movie.loc[user,index]
 	fin = pd.concat([f, corr], axis=1)
@@ -82,8 +80,8 @@ score = User_item_score(320, 7371)
 print("score (u,i) is", score)
 """
 
-Rating_avg = Rating_avg.astype({"movieId": str})
-Movie_user = Rating_avg.groupby(by = 'userId')['movieId'].apply(lambda x:','.join(x))
+search_avg = search_avg.astype({"policyId": str})
+Movie_user = search_avg.groupby(by = 'userId')['policyId'].apply(lambda x:','.join(x))
 
 def User_item_score1(user):
 	Movie_seen_by_user = check.columns[check[check.index==user].notna().any()].tolist()
@@ -99,7 +97,7 @@ def User_item_score1(user):
 		c = final_movie.loc[:,item]
 		d = c[c.index.isin(b)]
 		f = d[d.notnull()]
-		avg_user = Mean.loc[Mean['userId'] == user,'rating'].values[0]
+		avg_user = mean.loc[mean['userId'] == user,'numsearch'].values[0]
 		index = f.index.values.squeeze().tolist()
 		corr = similarity_with_movie.loc[user,index]
 		fin = pd.concat([f, corr], axis=1)
@@ -109,9 +107,9 @@ def User_item_score1(user):
 		deno = fin['correlation'].sum()
 		final_score = avg_user + (nume/deno)
 		score.append(final_score)
-	data = pd.DataFrame({'movieId':Movies_under_consideration,'score':score})
+	data = pd.DataFrame({'policyId':Movies_under_consideration,'score':score})
 	top_5_recommendation = data.sort_values(by='score',ascending=False).head(5)
-	Movie_Name = top_5_recommendation.merge(movies, how='inner', on='movieId')
+	Movie_Name = top_5_recommendation.merge(policies, how='inner', on='policyId')
 	Movie_Names = Movie_Name.title.values.tolist()
 	return Movie_Names
 
