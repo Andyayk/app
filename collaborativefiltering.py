@@ -2,21 +2,28 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics import pairwise_distances
+from sklearn.preprocessing import OneHotEncoder
 
 #User-Based Collaborative Filtering
 #s is the predicted score, u is the user, i is the item, r is the search given by the user and w is the weight.
 
 policies = pd.read_csv("policies.csv", encoding="Latin1") #read csv to dataframe
 searches = pd.read_csv("searches.csv") #read csv to dataframe
+users = pd.read_csv("users.csv") #read csv to dataframe
+df = pd.concat([users, pd.get_dummies(users['jobtype'], prefix='jobtype', dummy_na=True)],axis=1).drop(['jobtype'], axis=1)
+print(df)
 
-mean = searches.groupby(by="userId", as_index=False)['numsearch'].mean() #calculating mean search for each user
-search_avg = pd.merge(searches, mean, on='userId') #add the mean column to original dataframe
+mean = searches.groupby(by="username", as_index=False)['numsearch'].mean() #calculating mean search for each user
+search_avg = pd.merge(searches, mean, on='username') #add the mean column to dataframe
 search_avg['avg_search'] = search_avg['numsearch_x'] - search_avg['numsearch_y'] #calculate weighted average
 
-check = pd.pivot_table(search_avg, values='numsearch_x', index='userId', columns='policyId') #for checking if user searched the policies already or not
-final = pd.pivot_table(search_avg, values='avg_search', index='userId', columns='policyId') #creating pivot table for weighted average
+check = pd.pivot_table(search_avg, values='numsearch_x', index='username', columns='policyId') #for checking if user searched the policies already or not
+final = pd.pivot_table(search_avg, values='avg_search', index='username', columns='policyId') #creating pivot table for weighted average
+print(final)
 
 final_policy = final.fillna(final.mean(axis=0)) #replacing NaN by policies average
+final_policy = pd.concat([final_policy, df], axis=1)
+print(final_policy)
 
 """
 final_user = final.apply(lambda row: row.fillna(row.mean()), axis=1) #replacing NaN by user average
@@ -37,8 +44,8 @@ print(similarity_with_policy)
 
 """
 def get_user_similar_policies(user1, user2):
-	common_policies = search_avg[search_avg.userId == user1].merge(
-	search_avg[search_avg.userId == user2],
+	common_policies = search_avg[search_avg.username == user1].merge(
+	search_avg[search_avg.username == user2],
 	on = "policyId",
 	how = "inner" )
 	return common_policies.merge( policies, on = 'policyId' )
@@ -56,10 +63,10 @@ def find_n_neighbours(df, n):
 	return df
 
 """
-sim_user_u = find_n_neighbours(similarity_with_user, 2) #top k neighbours for each user
+sim_user_u = find_n_neighbours(similarity_with_user, 3) #top k neighbours for each user
 """
 
-sim_user_m = find_n_neighbours(similarity_with_policy, 2) #top k neighbours for each user
+sim_user_m = find_n_neighbours(similarity_with_policy, 3) #top k neighbours for each user
 print(sim_user_m)
 
 """
@@ -69,12 +76,12 @@ def user_item_score(user, item):
 	c = final_policy.loc[:,item]
 	d = c[c.index.isin(b)]
 	f = d[d.notnull()]
-	avg_user = mean.loc[mean['userId'] == user,'numsearch'].values[0]
+	avg_user = mean.loc[mean['username'] == user,'numsearch'].values[0]
 	index = f.index.values.squeeze().tolist()
 	corr = similarity_with_policy.loc[user,index]
 	fin = pd.concat([f, corr], axis=1)
-	fin.columns = ['adg_score','correlation']
-	fin['score']=fin.apply(lambda x:x['adg_score'] * x['correlation'],axis=1)
+	fin.columns = ['avg_score','correlation']
+	fin['score']=fin.apply(lambda x:x['avg_score'] * x['correlation'],axis=1)
 	nume = fin['score'].sum()
 	deno = fin['correlation'].sum()
 	final_score = avg_user + (nume/deno)
@@ -85,7 +92,7 @@ print("score (u,i) is", score)
 """
 
 search_avg = search_avg.astype({"policyId": str})
-policy_user = search_avg.groupby(by = 'userId')['policyId'].apply(lambda x:','.join(x))
+policy_user = search_avg.groupby(by = 'username')['policyId'].apply(lambda x:','.join(x))
 
 def user_policy_score(user):
 	policy_seen_by_user = check.columns[check[check.index==user].notna().any()].tolist()
@@ -101,12 +108,12 @@ def user_policy_score(user):
 		c = final_policy.loc[:,item]
 		d = c[c.index.isin(b)]
 		f = d[d.notnull()]
-		avg_user = mean.loc[mean['userId'] == user,'numsearch'].values[0]
+		avg_user = mean.loc[mean['username'] == user,'numsearch'].values[0]
 		index = f.index.values.squeeze().tolist()
 		corr = similarity_with_policy.loc[user,index]
 		fin = pd.concat([f, corr], axis=1)
-		fin.columns = ['adg_score','correlation']
-		fin['score']=fin.apply(lambda x:x['adg_score'] * x['correlation'],axis=1)
+		fin.columns = ['avg_score','correlation']
+		fin['score']=fin.apply(lambda x:x['avg_score'] * x['correlation'],axis=1)
 		nume = fin['score'].sum()
 		deno = fin['correlation'].sum()
 		final_score = avg_user + (nume/deno)
@@ -117,11 +124,11 @@ def user_policy_score(user):
 	policy_names = policy_name.title.values.tolist()
 	return policy_names
 
-user = int(input("Enter the user id to whom you want to recommend : "))
-predicted_movies = user_policy_score(user)
+user = input("Enter the username to whom you want to recommend : ")
+predicted_policies = user_policy_score(user)
 print(" ")
-print("The Recommendations for User Id : ", user)
+print("The recommendations for username are : ", user)
 print("   ")
 
-for i in predicted_movies:
+for i in predicted_policies:
 	print(i)
