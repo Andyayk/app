@@ -1,8 +1,8 @@
 username,dateofbirth,dateofhire,jobtype
-andyayk,21/11/1994,6/5/2019,IT
-lk,1/8/1994,16/1/2019,IT
-jo,1/5/1985,2/3/1999,IT
-hy,3/4/1968,17/2/1984,Finance
-ys,16/9/1978,13/12/1990,Finance
-jw,25/2/1989,1/4/2007,Human Resource
-de,31/1/1966,5/10/1980,Human Resource
+andyayk,1994-11-21,2019-05-06,IT
+lk,1994-08-01,2019-01-16,IT
+jo,1985-05-01,1999-03-02,IT
+hy,1968-04-03,1984-02-17,Finance
+ys,1978-09-16,1990-12-13,Finance
+jw,1989-02-25,2007-04-01,Human Resource
+de,1966-01-31,1980-10-05,Human Resource

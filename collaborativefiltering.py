@@ -10,8 +10,17 @@ from sklearn.preprocessing import OneHotEncoder
 policies = pd.read_csv("policies.csv", encoding="Latin1") #read csv to dataframe
 searches = pd.read_csv("searches.csv") #read csv to dataframe
 users = pd.read_csv("users.csv") #read csv to dataframe
-df = pd.concat([users, pd.get_dummies(users['jobtype'], prefix='jobtype', dummy_na=True)],axis=1).drop(['jobtype'], axis=1)
-print(df)
+users = users.set_index('username')
+usersdf = pd.concat([users, pd.get_dummies(users['jobtype'], prefix='jobtype')], axis=1).drop(['jobtype'], axis=1)
+
+usersdf['dateofbirth'] = pd.to_datetime(usersdf['dateofbirth'], format='%Y-%m-%d')
+usersdf['dateofhire'] = pd.to_datetime(usersdf['dateofhire'], format='%Y-%m-%d')
+
+usersdf['age'] = (pd.to_datetime('now') - usersdf['dateofbirth']).astype('<m8[D]')
+usersdf['employmentage'] = (pd.to_datetime('now') - usersdf['dateofhire']).astype('<m8[D]')
+
+usersdf = usersdf.drop(["dateofbirth", "dateofhire"], axis=1) #drop dates
+print(usersdf)
 
 mean = searches.groupby(by="username", as_index=False)['numsearch'].mean() #calculating mean search for each user
 search_avg = pd.merge(searches, mean, on='username') #add the mean column to dataframe
@@ -19,10 +28,9 @@ search_avg['avg_search'] = search_avg['numsearch_x'] - search_avg['numsearch_y']
 
 check = pd.pivot_table(search_avg, values='numsearch_x', index='username', columns='policyId') #for checking if user searched the policies already or not
 final = pd.pivot_table(search_avg, values='avg_search', index='username', columns='policyId') #creating pivot table for weighted average
-print(final)
 
 final_policy = final.fillna(final.mean(axis=0)) #replacing NaN by policies average
-final_policy = pd.concat([final_policy, df], axis=1)
+final_policy = pd.merge(final_policy, usersdf, on='username') #add users columns to dataframe
 print(final_policy)
 
 """
@@ -36,7 +44,7 @@ similarity_with_user.columns = final_user.index
 """
 
 #user similarity on replacing NaN by item(policies) average
-cosine = cosine_similarity(final_policy)
+cosine = cosine_similarity(final_policy) #normalized
 np.fill_diagonal(cosine, 0) #fill diagonal with zeros
 similarity_with_policy = pd.DataFrame(cosine, index=final_policy.index) #create dataframe
 similarity_with_policy.columns = final_policy.index #change column names
