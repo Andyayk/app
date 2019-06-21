@@ -23,8 +23,10 @@
 		</div>
 		<br><br>
 
-		<div v-for="(row, index) in predicted_policies">
-			<p>[[ row ]]</p>
+		<div class="card">
+			<p v-for="(row, index) in predicted_policies">
+				[[ row ]]
+			</p>
 		</div>
 
 		<template v-if="showpolicytable">
