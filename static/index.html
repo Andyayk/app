@@ -23,6 +23,10 @@
 		</div>
 		<br><br>
 
+		<div v-for="(row, index) in predicted_policies">
+			<p>[[ row ]]</p>
+		</div>
+
 		<template v-if="showpolicytable">
 		<table id="policytable" class="table table-bordered table-hover">
 		  <thead class="thead-dark">
@@ -84,8 +88,12 @@
 				showpolicytable: false, 
 				policyinfodata: '', 
 				relatedinfodata: '', 
-				topictitle: ''
-			},		
+				topictitle: '',
+				predicted_policies: ''
+			},
+			mounted:function(){
+        		this.recommend() //method1 will execute at pageload
+  			},			
 			methods: { // define methods under the `methods` object
 				search: function() { //search method
 					this.$http.post('/search', { //post request
@@ -139,7 +147,12 @@
 							this.topictitle = ''; //reset
 						}		
 					}.bind(this));			
-				}					
+				},
+				recommend: function() { //recommend method
+					$.get('/recommend/', function(data, status){
+						this.predicted_policies = data.results;
+					}.bind(this));
+				}							
 			}
 		})		
 	</script>

@@ -5,7 +5,6 @@ from sklearn.metrics import pairwise_distances
 from sklearn.preprocessing import OneHotEncoder
 
 #User-Based Collaborative Filtering
-#s is the predicted score, u is the user, i is the item, r is the search given by the user and w is the weight.
 
 policies = pd.read_csv("policies.csv", encoding="Latin1") #read csv to dataframe
 searches = pd.read_csv("searches.csv") #read csv to dataframe
@@ -71,10 +70,10 @@ def find_n_neighbours(df, n):
 	return df
 
 """
-sim_user_u = find_n_neighbours(similarity_with_user, 3) #top k neighbours for each user
+sim_user_u = find_n_neighbours(similarity_with_user, 10) #top k neighbours for each user
 """
 
-sim_user_m = find_n_neighbours(similarity_with_policy, 3) #top k neighbours for each user
+sim_user_m = find_n_neighbours(similarity_with_policy, 10) #top k neighbours for each user
 print(sim_user_m)
 
 """
