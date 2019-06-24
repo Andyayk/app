@@ -266,7 +266,7 @@ def recommend():
 	query = 'MATCH (n:Policy) RETURN ID(n) as policyId, n.name as title'
 	policieslist = (list(graph.run(query))) #retrieve policies
 	policies = pd.DataFrame(policieslist, columns=['policyId', 'title']) #rename columns
-	
+
 	searches = pd.read_csv("searches.csv") #read csv to dataframe
 	users = pd.read_csv("users.csv") #read csv to dataframe
 	users = users.set_index('username')
@@ -275,10 +275,10 @@ def recommend():
 	usersdf['dateofbirth'] = pd.to_datetime(usersdf['dateofbirth'], format='%Y-%m-%d')
 	usersdf['dateofhire'] = pd.to_datetime(usersdf['dateofhire'], format='%Y-%m-%d')
 
-	usersdf['age'] = (pd.to_datetime('now') - usersdf['dateofbirth']).astype('<m8[D]')
-	usersdf['employmentage'] = (pd.to_datetime('now') - usersdf['dateofhire']).astype('<m8[D]')
+	usersdf['age'] = (pd.to_datetime('now') - usersdf['dateofbirth']).astype('<m8[D]') #calculate age
+	usersdf['employmentage'] = (pd.to_datetime('now') - usersdf['dateofhire']).astype('<m8[D]') #calculate employment age
 
-	usersdf = usersdf.drop(["dateofbirth", "dateofhire"], axis=1) #drop dates
+	usersdf = usersdf.drop(["dateofbirth", "dateofhire", "password", "email"], axis=1) #drop dates
 
 	mean = searches.groupby(by="username", as_index=False)['numsearch'].mean() #calculating mean search for each user
 	search_avg = pd.merge(searches, mean, on='username') #add the mean column to dataframe
