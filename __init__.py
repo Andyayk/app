@@ -210,7 +210,6 @@ def search():
 def get_related():
 	name  = request.args.get('name')
 	label  = request.args.get('label')
-	print(name)
 
 	if label == "Person": #so that it will only run once
 		user = graph.evaluate('MATCH (x:User) WHERE x.username = {username} RETURN x', parameters={"username": current_user.id}) #retrieve user node
@@ -264,7 +263,10 @@ def get_related():
 #User-Based Collaborative Filtering
 @app.route("/recommend/", methods=["GET"])
 def recommend():
-	policies = pd.read_csv("policies.csv", encoding="Latin1") #read csv to dataframe
+	query = 'MATCH (n:Policy) RETURN ID(n) as policyId, n.name as title'
+	policieslist = (list(graph.run(query))) #retrieve policies
+	policies = pd.DataFrame(policieslist, columns=['policyId', 'title']) #rename columns
+	
 	searches = pd.read_csv("searches.csv") #read csv to dataframe
 	users = pd.read_csv("users.csv") #read csv to dataframe
 	users = users.set_index('username')
