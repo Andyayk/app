@@ -113,6 +113,7 @@
 					var element = e.target; //retrieve element
 					policyname = $(element).text();
 					document.getElementById("policyname").innerHTML = policyname; //set title
+					policyname = encodeURIComponent(policyname); //encode special symbols
 					$.get('/get_related/?name=' + policyname + '&label=Person' , function(data, status){
 						policyinforesults = data.results;
 						if (policyinforesults != null) {

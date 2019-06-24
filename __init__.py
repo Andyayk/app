@@ -210,6 +210,20 @@ def search():
 def get_related():
 	name  = request.args.get('name')
 	label  = request.args.get('label')
+	print(name)
+
+	if label == "Person": #so that it will only run once
+		user = graph.evaluate('MATCH (x:User) WHERE x.username = {username} RETURN x', parameters={"username": current_user.id}) #retrieve user node
+		policy = Node("Policy", name=name) #creating a node
+		relationship = Relationship.type('SEARCH') #changing it into a relationship type
+		numsearch = graph.evaluate('MATCH (n:User)-[r:SEARCH]->(p:Policy) WHERE p.name = {name} RETURN r.numsearch', parameters={"name": name}) #retrieve numsearch
+		
+		if numsearch == None:
+			numsearch = 1 #set numsearch as 1
+		else:
+			numsearch += 1 #increase numsearch
+
+		graph.merge(relationship(user, policy, numsearch=numsearch), "Node", "name") #merging nodes with relationship		
 
 	query = '''
 	MATCH (node:%s)-[relatedTo]-(:Policy {name: {name}}) 
