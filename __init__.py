@@ -215,7 +215,7 @@ def get_related():
 		query = '''
 		MATCH (node:User)
 		WHERE node.username = {username}
-		RETURN x
+		RETURN node
 		'''
 		user = graph.evaluate(query, parameters={"username": current_user.id}) #retrieve user node
 		policy = Node("Policy", name=name) #creating a node
@@ -223,11 +223,11 @@ def get_related():
 		relationship = Relationship.type('SEARCH') #changing it into a relationship type
 		query2 = '''
 		MATCH (node:User)-[s:SEARCH]->(p:Policy)
-		WHERE p.name = {name}
+		WHERE p.name = {name} AND node.username = {username}
 		RETURN s.numsearch
 		'''
-		numsearch = graph.evaluate(query2, parameters={"name": name}) #retrieve numsearch
-		
+		numsearch = graph.evaluate(query2, parameters={"name": name, "username": current_user.id}) #retrieve numsearch
+
 		if numsearch == None:
 			numsearch = 1 #set numsearch as 1
 		else:
@@ -306,7 +306,7 @@ def recommend():
 	'''
 	searchlist = (list(graph.run(query3))) #retrieve searches from database
 	searches = pd.DataFrame(searchlist, columns=['username', 'policyId', 'numsearch']) #create dataframe and rename columns
-	print(searches.dtypes)
+
 	mean = searches.groupby(by="username", as_index=False)['numsearch'].mean() #calculating mean search for each user
 	search_avg = pd.merge(searches, mean, on='username') #add the mean column to dataframe
 	search_avg['avg_search'] = search_avg['numsearch_x'] - search_avg['numsearch_y'] #calculate weighted average
@@ -380,7 +380,7 @@ Neo4j Commands:
 LOAD CSV WITH HEADERS FROM 'file:///searches.csv' AS line
 MATCH (node:User {username: line.username})
 MATCH (p:Policy) WHERE ID(p) = toInt(line.policyId)
-MERGE (node)-[s:SEARCH {numsearch: line.numsearch}]->(p)
+MERGE (node)-[s:SEARCH {numsearch: toInt(line.numsearch)}]->(p)
 
 CREATE (ee:Person {name: 'Emil'})
 
