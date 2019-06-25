@@ -307,15 +307,27 @@ def recommend():
 	searchlist = (list(graph.run(query3))) #retrieve searches from database
 	searches = pd.DataFrame(searchlist, columns=['username', 'policyId', 'numsearch']) #create dataframe and rename columns
 
+	query4 = '''
+	MATCH (node:User)-[s:SEARCH]->(p:Policy) 
+    WHERE node.username = {username}
+	RETURN node.username as username, ID(p) as policyId, s.numsearch as numsearch
+	'''
+	newuser = graph.run(query4, parameters={"username": current_user.id}) #check if new user
+
 	mean = searches.groupby(by="username", as_index=False)['numsearch'].mean() #calculating mean search for each user
+
+	if not newuser.evaluate(): #if no results
+		df = {'username': current_user.id, 'numsearch': 0} #set numsearch as 0
+		mean = mean.append(df, ignore_index = True) #add row to mean dataframe
+
 	search_avg = pd.merge(searches, mean, on='username') #add the mean column to dataframe
 	search_avg['avg_search'] = search_avg['numsearch_x'] - search_avg['numsearch_y'] #calculate weighted average
 
 	check = pd.pivot_table(search_avg, values='numsearch_x', index='username', columns='policyId') #for checking if user searched the policies already or not
 	final = pd.pivot_table(search_avg, values='avg_search', index='username', columns='policyId') #creating pivot table for weighted average
 
-	final_policy = final.fillna(final.mean(axis=0)) #replacing NaN by policies average
-	final_policy = pd.merge(final_policy, usersdf, on='username') #add users columns to dataframe
+	final_policy = pd.merge(usersdf, final, on='username', how='left') #add users columns to dataframe
+	final_policy = final_policy.fillna(final.mean(axis=0)) #replacing NaN by policies average
 
 	#user similarity on replacing NaN by item(policies) average
 	cosine = cosine_similarity(final_policy) #normalized, penalise long documents
@@ -325,8 +337,8 @@ def recommend():
 
 	sim_user_m = find_n_neighbours(similarity_with_policy, 10) #top k neighbours for each user
 
-	search_avg = search_avg.astype({"policyId": str})
-	policy_user = search_avg.groupby(by = 'username')['policyId'].apply(lambda x:','.join(x))
+	search_avg = search_avg.astype({"policyId": str}) #change policyId type to str
+	policy_user = search_avg.groupby(by = 'username')['policyId'].apply(lambda x:','.join(x)) #group policyid by username
 
 	predicted_policies = user_policy_score(current_user.id, check, sim_user_m, policy_user, final_policy, mean, similarity_with_policy, policies)
 
