@@ -274,6 +274,7 @@ def get_related():
 #User-Based Collaborative Filtering
 @app.route("/recommend/", methods=["GET"])
 def recommend():
+	#policies data
 	query = '''
 	MATCH (node:Policy) 
 	RETURN ID(node) as policyId, node.name as title
@@ -281,6 +282,7 @@ def recommend():
 	policieslist = (list(graph.run(query))) #retrieve policies from database
 	policies = pd.DataFrame(policieslist, columns=['policyId', 'title']) #create dataframe and rename columns
 
+	#user data
 	query2 = '''
 	MATCH (node:User) 
 	RETURN node.username as username, node.dateofbirth as dateofbirth, node.dateofhire as dateofhire, node.jobtype as jobtype, node.email as email, node.password as password
@@ -297,16 +299,14 @@ def recommend():
 
 	usersdf = usersdf.drop(["dateofbirth", "dateofhire", "password", "email"], axis=1) #drop irrelevant columns
 
-	searches = pd.read_csv("searches.csv") #read csv to dataframe
-	print(searches.head())
+	#search data
 	query3 = '''
 	MATCH (node:User)-[s:SEARCH]->(p:Policy) 
 	RETURN node.username as username, ID(p) as policyId, s.numsearch as numsearch
 	'''
 	searchlist = (list(graph.run(query3))) #retrieve searches from database
-	policies = pd.DataFrame(searchlist, columns=['username', 'policyId', 'numsearch']) #create dataframe and rename columns
-	print(policies.head())
-
+	searches = pd.DataFrame(searchlist, columns=['username', 'policyId', 'numsearch']) #create dataframe and rename columns
+	print(searches.dtypes)
 	mean = searches.groupby(by="username", as_index=False)['numsearch'].mean() #calculating mean search for each user
 	search_avg = pd.merge(searches, mean, on='username') #add the mean column to dataframe
 	search_avg['avg_search'] = search_avg['numsearch_x'] - search_avg['numsearch_y'] #calculate weighted average
@@ -373,3 +373,23 @@ def user_policy_score(user, check, sim_user_m, policy_user, final_policy, mean, 
 	policy_name = top_5_recommendation.merge(policies, how='inner', on='policyId')
 	policy_names = policy_name.title.values.tolist()
 	return policy_names
+
+"""
+Neo4j Commands:
+
+LOAD CSV WITH HEADERS FROM 'file:///searches.csv' AS line
+MATCH (node:User {username: line.username})
+MATCH (p:Policy) WHERE ID(p) = toInt(line.policyId)
+MERGE (node)-[s:SEARCH {numsearch: line.numsearch}]->(p)
+
+CREATE (ee:Person {name: 'Emil'})
+
+MATCH (ee:Person) WHERE ee.name = "Emil" RETURN ee
+
+MATCH (ee:PERSON)-[:KNOWS]-(friends) WHERE ee.name = "Emil" RETURN ee, friends
+
+WITH -> Manipulate the output before it is passed on
+COLLECT -> Group by
+REDUCE -> Iterate in each element and run the expression
+MATCH (n) DETACH DELETE n
+"""
