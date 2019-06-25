@@ -38,10 +38,10 @@ def load_user(username):
 	dateofhire = None
 
 	query = '''
-			MATCH (node:User)
-			WHERE node.username =~ {name}
-			RETURN node.email as email, node.dateofbirth as dateofbirth, node.jobtype as jobtype, node.dateofhire as dateofhire 
-			'''
+	MATCH (node:User)
+	WHERE node.username =~ {name}
+	RETURN node.email as email, node.dateofbirth as dateofbirth, node.jobtype as jobtype, node.dateofhire as dateofhire 
+	'''
 
 	#get query
 	results = graph.run(query, parameters={"name": username})
@@ -65,10 +65,10 @@ def login():
 		password = request.form.get('password') #get password
 
 		query = '''
-				MATCH (node:User)
-				WHERE node.username =~ {name}
-				RETURN node.password as password
-				'''
+		MATCH (node:User)
+		WHERE node.username =~ {name}
+		RETURN node.password as password
+		'''
 
 		querytest = '''
 		MATCH (node:User)
@@ -117,10 +117,10 @@ def register():
 		password = request.form.get('password') #get password
 
 		query = '''
-				MATCH (node:User)
-				WHERE node.username =~ {name}
-				RETURN node
-				'''
+		MATCH (node:User)
+		WHERE node.username =~ {name}
+		RETURN node
+		'''
 
 		querytest = '''
 		MATCH (node:User)
@@ -212,10 +212,21 @@ def get_related():
 	label  = request.args.get('label')
 
 	if label == "Person": #so that it will only run once
-		user = graph.evaluate('MATCH (x:User) WHERE x.username = {username} RETURN x', parameters={"username": current_user.id}) #retrieve user node
+		query = '''
+		MATCH (node:User)
+		WHERE node.username = {username}
+		RETURN x
+		'''
+		user = graph.evaluate(query, parameters={"username": current_user.id}) #retrieve user node
 		policy = Node("Policy", name=name) #creating a node
+
 		relationship = Relationship.type('SEARCH') #changing it into a relationship type
-		numsearch = graph.evaluate('MATCH (n:User)-[r:SEARCH]->(p:Policy) WHERE p.name = {name} RETURN r.numsearch', parameters={"name": name}) #retrieve numsearch
+		query2 = '''
+		MATCH (node:User)-[s:SEARCH]->(p:Policy)
+		WHERE p.name = {name}
+		RETURN s.numsearch
+		'''
+		numsearch = graph.evaluate(query2, parameters={"name": name}) #retrieve numsearch
 		
 		if numsearch == None:
 			numsearch = 1 #set numsearch as 1
@@ -263,22 +274,38 @@ def get_related():
 #User-Based Collaborative Filtering
 @app.route("/recommend/", methods=["GET"])
 def recommend():
-	query = 'MATCH (n:Policy) RETURN ID(n) as policyId, n.name as title'
-	policieslist = (list(graph.run(query))) #retrieve policies
-	policies = pd.DataFrame(policieslist, columns=['policyId', 'title']) #rename columns
+	query = '''
+	MATCH (node:Policy) 
+	RETURN ID(node) as policyId, node.name as title
+	'''
+	policieslist = (list(graph.run(query))) #retrieve policies from database
+	policies = pd.DataFrame(policieslist, columns=['policyId', 'title']) #create dataframe and rename columns
 
-	searches = pd.read_csv("searches.csv") #read csv to dataframe
-	users = pd.read_csv("users.csv") #read csv to dataframe
-	users = users.set_index('username')
-	usersdf = pd.concat([users, pd.get_dummies(users['jobtype'], prefix='jobtype')], axis=1).drop(['jobtype'], axis=1)
-
-	usersdf['dateofbirth'] = pd.to_datetime(usersdf['dateofbirth'], format='%Y-%m-%d')
-	usersdf['dateofhire'] = pd.to_datetime(usersdf['dateofhire'], format='%Y-%m-%d')
+	query2 = '''
+	MATCH (node:User) 
+	RETURN node.username as username, node.dateofbirth as dateofbirth, node.dateofhire as dateofhire, node.jobtype as jobtype, node.email as email, node.password as password
+	'''
+	userslist = (list(graph.run(query2))) #retrieve users from database
+	users = pd.DataFrame(userslist, columns=['username', 'dateofbirth', 'dateofhire', 'jobtype', 'email', 'password']) #create dataeframe and rename columns	
+	users = users.set_index('username') #set dataframe's index as username
+	usersdf = pd.concat([users, pd.get_dummies(users['jobtype'], prefix='jobtype')], axis=1).drop(['jobtype'], axis=1) #one hot encoding
+	usersdf['dateofbirth'] = pd.to_datetime(usersdf['dateofbirth'], format='%Y-%m-%d') #format date
+	usersdf['dateofhire'] = pd.to_datetime(usersdf['dateofhire'], format='%Y-%m-%d') #format date
 
 	usersdf['age'] = (pd.to_datetime('now') - usersdf['dateofbirth']).astype('<m8[D]') #calculate age
 	usersdf['employmentage'] = (pd.to_datetime('now') - usersdf['dateofhire']).astype('<m8[D]') #calculate employment age
 
-	usersdf = usersdf.drop(["dateofbirth", "dateofhire", "password", "email"], axis=1) #drop dates
+	usersdf = usersdf.drop(["dateofbirth", "dateofhire", "password", "email"], axis=1) #drop irrelevant columns
+
+	searches = pd.read_csv("searches.csv") #read csv to dataframe
+	print(searches.head())
+	query3 = '''
+	MATCH (node:User)-[s:SEARCH]->(p:Policy) 
+	RETURN node.username as username, ID(p) as policyId, s.numsearch as numsearch
+	'''
+	searchlist = (list(graph.run(query3))) #retrieve searches from database
+	policies = pd.DataFrame(searchlist, columns=['username', 'policyId', 'numsearch']) #create dataframe and rename columns
+	print(policies.head())
 
 	mean = searches.groupby(by="username", as_index=False)['numsearch'].mean() #calculating mean search for each user
 	search_avg = pd.merge(searches, mean, on='username') #add the mean column to dataframe
@@ -291,7 +318,7 @@ def recommend():
 	final_policy = pd.merge(final_policy, usersdf, on='username') #add users columns to dataframe
 
 	#user similarity on replacing NaN by item(policies) average
-	cosine = cosine_similarity(final_policy) #normalized
+	cosine = cosine_similarity(final_policy) #normalized, penalise long documents
 	np.fill_diagonal(cosine, 0) #fill diagonal with zeros
 	similarity_with_policy = pd.DataFrame(cosine, index=final_policy.index) #create dataframe
 	similarity_with_policy.columns = final_policy.index #change column names
@@ -301,12 +328,13 @@ def recommend():
 	search_avg = search_avg.astype({"policyId": str})
 	policy_user = search_avg.groupby(by = 'username')['policyId'].apply(lambda x:','.join(x))
 
-	predicted_policies = user_policy_score("user1", check, sim_user_m, policy_user, final_policy, mean, similarity_with_policy, policies)
+	predicted_policies = user_policy_score(current_user.id, check, sim_user_m, policy_user, final_policy, mean, similarity_with_policy, policies)
 
 	return jsonify(
 		results = predicted_policies
 	)
 
+#k-nearest neighbours
 def find_n_neighbours(df, n):
 	order = np.argsort(df.values, axis=1)[:, :n]
 	df = df.apply(lambda x: pd.Series(x.sort_values(ascending=False)
@@ -315,6 +343,7 @@ def find_n_neighbours(df, n):
 		axis=1)
 	return df
 
+#sorting recommendations
 def user_policy_score(user, check, sim_user_m, policy_user, final_policy, mean, similarity_with_policy, policies):
 	policy_seen_by_user = check.columns[check[check.index==user].notna().any()].tolist()
 	a = sim_user_m[sim_user_m.index==user].values
