@@ -1,7 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
+<!-- Recommendations -->
+<div id="recommendations" class="container-fluid">
+	<div class="card">
+		These recommendations are based on your profile!
+		<p>
+			<font size="2" v-for="(row, index) in predicted_policies">
+				[[ row ]]
+			</font>
+		</p>
+	</div>	
+</div>
 <!-- Masthead -->
-<header class="masthead text-center">
+<header class="masthead text-center">	
 <div class="container-fluid">
   <div class="row">
 	<div class="col-xl-9 mx-auto">
@@ -21,13 +32,6 @@
 		  </div>
 		</div>
 		<br><br>
-		<!--
-		<div class="card">
-			<p v-for="(row, index) in predicted_policies">
-				[[ row ]]
-			</p>
-		</div>
-		-->
 		<template v-if="showpolicytable">
 		<table id="policytable" class="table table-bordered table-hover">
 		  <thead class="thead-dark">
@@ -89,12 +93,8 @@
 				showpolicytable: false, 
 				policyinfodata: '', 
 				relatedinfodata: '', 
-				topictitle: '',
-				predicted_policies: ''
-			},
-			mounted:function(){
-        		this.recommend() //method1 will execute at pageload
-  			},			
+				topictitle: ''
+			},			
 			methods: { // define methods under the `methods` object
 				search: function() { //search method
 					this.$http.post('/search', { //post request
@@ -149,13 +149,26 @@
 							this.topictitle = ''; //reset
 						}		
 					}.bind(this));			
-				},
+				}						
+			}
+		})
+
+		var recommendations = new Vue({
+			el: '#recommendations', //element name
+			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
+			data: {
+				predicted_policies: ''
+			},
+			mounted:function(){
+        		this.recommend() //method will execute at pageload
+  			},			
+			methods: { // define methods under the `methods` object
 				recommend: function() { //recommend method
 					$.get('/recommend/', function(data, status){
 						this.predicted_policies = data.results;
 					}.bind(this));
-				}							
+				}
 			}
-		})		
+		})				
 	</script>
 {% endblock %}
