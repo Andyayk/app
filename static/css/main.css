@@ -1,68 +1,41 @@
 header.masthead {
-    
   position:relative;
-    
   background-color: ;
   background:url(../img/bg-masthead.jpg) no-repeat center center;
-    
   background-size:cover;
-    
   padding-top:8rem;
-    
   padding-bottom:8rem
-
 }
 
 header.masthead 
 .overlay {
-    
   position:absolute;
-    
   background-color: ;
-    
   height:100%;
-    
   width:100%;
-    
   top:0;
-    
   left:0;
-    
   opacity:.3
-
 }
 
 @media (min-width:768px) {
-    
   header.masthead {
-        
     padding-top:7rem;
-        
     padding-bottom:12rem
-    
   }
     
   header.masthead h1 {
-        
     font-size:3rem
-    
   }
-
 }
 
 header.masthead {
-    
   position:relative;
-    
   background-color: ;
-    
   background:url(../img/bg-masthead.jpg) no-repeat center center;
-      background-size:cover;
-    
+  background-size:cover;
   padding-top:8rem;
-    
   padding-bottom:8rem
-
 }
 
 footer.footer {
