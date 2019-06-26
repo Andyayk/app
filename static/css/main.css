@@ -4,14 +4,10 @@ header.masthead {
   background-size:cover;
 }
 
-header.masthead h1{
-    font-size:2rem
-}
-
 @media (min-width:768px) {
   header.masthead {
-    padding-top:2rem;
-    padding-bottom:20rem
+    padding-top:7rem;
+    padding-bottom:12rem
   }
 }
 
@@ -40,8 +36,4 @@ a {
 
 a:hover { 
   background-color: #E0E0E0;
-}
-
-h1 {
-  text-align: center; 
 }
