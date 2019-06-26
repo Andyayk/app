@@ -1,18 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
+<!-- Masthead -->
+<header class="masthead text-center">
 <!-- Recommendations -->
 <div id="recommendations" class="container-fluid">
-	<div class="card">
-		These recommendations are based on your profile!
-		<p>
-			<font size="2" v-for="(row, index) in predicted_policies">
-				[[ row ]]
-			</font>
-		</p>
-	</div>	
+	<div class="card text-center mx-auto" style="width: 48rem;">
+		<h5>Recommendations based on your profile:</h5>
+		<font size="2" v-for="(row, index) in predicted_policies">
+			[[ row ]]
+		</font>
+	</div>
 </div>
-<!-- Masthead -->
-<header class="masthead text-center">	
+<br><br>
 <div class="container-fluid">
   <div class="row">
 	<div class="col-xl-9 mx-auto">
