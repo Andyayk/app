@@ -2,81 +2,83 @@
 {% block content %}
 <!-- Masthead -->
 <header class="masthead text-center">
-<!-- Recommendations -->
-<div id="recommendations" class="container-fluid">
-	<div class="card text-center mx-auto" style="width: 48rem;">
-		<h5>Recommendations based on your profile:</h5>
-		<font size="2" v-for="(row, index) in predicted_policies">
-			[[ row ]]
-		</font>
-	</div>
-</div>
-<br><br>
-<div class="container-fluid">
-  <div class="row">
-	<div class="col-xl-9 mx-auto">
-	  <h2 class="mb-3">Human Resource Policies</h2>
-	</div>
-	<div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-	  <form 
-	  id="searchbar"
-	  v-on:submit.prevent="search"
-	  >
-		<div class="form-row">
-		  <div class="col-12 col-md-9 mb-2 mb-md-0">
-			<input name="query" v-model="query" class="form-control form-control-lg" placeholder="Enter your query" required>
-		  </div>
-		  <div class="col-12 col-md-3">
-			<button type="submit" class="btn btn-block btn-lg btn-primary">Search!</button>
-		  </div>
+	<!-- Recommendations -->
+	<div id="recommendations" class="container-fluid">
+		<div class="card text-left mx-auto" style="width: 30rem;">
+			<h5>Recommendations based on your profile:</h5>
+			<font size="2" v-for="(row, index) in predicted_policies">
+				[[ row ]]
+			</font>
 		</div>
-		<br><br>
-		<template v-if="showpolicytable">
-		<table id="policytable" class="table table-bordered table-hover">
-		  <thead class="thead-dark">
-			<tr>
-			  <th scope="col">#</th>
-			  <th scope="col">Policy</th>
-			</tr>
-		  </thead>
-		  <tbody>
-			<tr v-on:click="get_related" class="table-light" v-for="(row, index) in results">
-			  <th scope="row">[[ index + 1 ]]</th>
-			  <td style="cursor: pointer;">[[ row.policy.name ]]</td>
-			</tr>
-		  </tbody>
-		</table>
-
-		<div class="card">
-		  <div class="card-body">
-			<h4 id="policyname" class="card-title">Policy Info</h4>
-			<hr color="black">
-			<div>
-				<ul>			
-					<li id="policyinfo" class="card-text" v-for="(value, key) in policyinfodata">
-						<b>[[ key.charAt(0).toUpperCase() + key.slice(1).toLowerCase() ]]</b>: [[ value ]]
-					</li>
-				</ul>
-			</div>
-			<h5>[[ topictitle ]]</h5>
-			<hr color="black">
-			<div v-for="(value) in relatedinfodata">
-				<a @click="value.open = !value.open" v-text="value.name"></a>
-				<ul v-show="value.open">
-				  	<p style="font-size:12px;" v-for="item in value.items" v-text="item"></p>
-				</ul>
-				<hr>
-			</div>						
-			<div>		
-				<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
-			</div>
-		  </div>
-		</div>
-		</template>
-	  </form>	  
 	</div>
-  </div>
-</div>
+	<br>
+	<div id="searchbar" class="container-fluid">
+		<div class="row">
+			<div class="col-xl-9 mx-auto">
+				<h2 class="mb-3">Human Resource Policies</h2>
+			</div>
+			<div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+				<form v-on:submit.prevent="search">
+				<div class="form-row">
+					<div class="col-12 col-md-9 mb-2 mb-md-0">
+						<input name="query" v-model="query" class="form-control form-control-lg" placeholder="Enter your query" required>
+					</div>
+					<div class="col-12 col-md-3">
+						<button type="submit" class="btn btn-block btn-lg btn-primary">Search!</button>
+					</div>
+				</div>
+				<br>
+				</form>	  
+			</div>
+		</div>
+		<div class="row">
+			<template v-if="showpolicytable">
+				<div class="col-md-6 mx-auto">
+					<table id="policytable" class="table table-bordered table-hover">
+						<thead class="thead-dark">
+							<tr>
+								<th scope="col"><h5>#</h5></th>
+								<th scope="col"><h5>Policy</h5></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-on:click="get_related" class="table-light" v-for="(row, index) in results">
+								<th scope="row">[[ index + 1 ]]</th>
+								<td style="cursor: pointer;">[[ row.policy.name ]]</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="col-md-6 mx-auto">
+					<div class="card">
+						<div class="card-body">
+							<h5 id="policyname" class="card-title">Policy Info</h5>
+							<hr color="black">
+							<div>
+								<ul>			
+									<li id="policyinfo" class="card-text" v-for="(value, key) in policyinfodata">
+										<b>[[ key.charAt(0).toUpperCase() + key.slice(1).toLowerCase() ]]</b>: [[ value ]]
+									</li>
+								</ul>
+							</div>
+							<h5>[[ topictitle ]]</h5>
+							<hr color="black">
+							<div v-for="(value) in relatedinfodata">
+								<a @click="value.open = !value.open" v-text="value.name"></a>
+								<ul v-show="value.open">
+									<p style="font-size:12px;" v-for="item in value.items" v-text="item"></p>
+								</ul>
+								<hr>
+							</div>						
+							<div>		
+								<a href="http://www.hr.uct.ac.za/hr/policies/HR_policies" class="card-link" target="_blank">HR Policies</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</template>
+		</div>  
+	</div>
 </header>
 {% endblock %}
 
@@ -132,11 +134,11 @@
 							var list = [];
 							for (var i = 0; i < names.length; i++){
 								var name = {
-								    "name": names[i],
-								    "open": false,
-								    "items": [
-								      textlist[i]
-								    ]
+									"name": names[i],
+									"open": false,
+									"items": [
+									  textlist[i]
+									]
 								};
 								list.push(name);
 							};
@@ -159,8 +161,8 @@
 				predicted_policies: ''
 			},
 			mounted:function(){
-        		this.recommend() //method will execute at pageload
-  			},			
+				this.recommend() //method will execute at pageload
+			},			
 			methods: { // define methods under the `methods` object
 				recommend: function() { //recommend method
 					$.get('/recommend/', function(data, status){
