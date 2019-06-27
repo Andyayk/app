@@ -2,16 +2,6 @@
 {% block content %}
 <!-- Masthead -->
 <header class="masthead text-center">
-	<!-- Recommendations -->
-	<div id="recommendations" class="container-fluid">
-		<div class="card text-left mx-auto" style="width: 30rem;">
-			<h5>Recommendations based on your profile:</h5>
-			<font size="2" v-for="(row, index) in predicted_policies">
-				[[ row ]]
-			</font>
-		</div>
-	</div>
-	<br>
 	<div id="searchbar" class="container-fluid">
 		<div class="row">
 			<div class="col-xl-9 mx-auto">
@@ -27,18 +17,28 @@
 						<button type="submit" class="btn btn-block btn-lg btn-primary">Search!</button>
 					</div>
 				</div>
-				<br>
 				</form>	  
 			</div>
 		</div>
+		<br><br>
+
+		<!-- Recommendations -->
+		<h6>Recommendations based on your profile</h6>
+		<div class="row">
+			<div class="card text-center col-md-2 p-2 mx-auto" v-for="(row, index) in predicted_policies">
+				<font size="2">[[ row ]]</font>
+			</div>
+		</div>
+		<br>
+
 		<div class="row">
 			<template v-if="showpolicytable">
 				<div class="col-md-6 mx-auto">
 					<table id="policytable" class="table table-bordered table-hover">
 						<thead class="thead-dark">
 							<tr>
-								<th scope="col"><h5>#</h5></th>
-								<th scope="col"><h5>Policy</h5></th>
+								<th scope="col"><h6>#</h6></th>
+								<th scope="col"><h6>Policy</h6></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -52,7 +52,7 @@
 				<div class="col-md-6 mx-auto">
 					<div class="card">
 						<div class="card-body">
-							<h5 id="policyname" class="card-title">Policy Info</h5>
+							<h6 id="policyname" class="card-title">Policy Info</h6>
 							<hr color="black">
 							<div>
 								<ul>			
@@ -61,7 +61,7 @@
 									</li>
 								</ul>
 							</div>
-							<h5>[[ topictitle ]]</h5>
+							<h6>[[ topictitle ]]</h6>
 							<hr color="black">
 							<div v-for="(value) in relatedinfodata">
 								<a @click="value.open = !value.open" v-text="value.name"></a>
@@ -94,8 +94,12 @@
 				showpolicytable: false, 
 				policyinfodata: '', 
 				relatedinfodata: '', 
-				topictitle: ''
-			},			
+				topictitle: '',
+				predicted_policies: ''
+			},	
+			mounted:function(){
+				this.recommend() //method will execute at pageload
+			},					
 			methods: { // define methods under the `methods` object
 				search: function() { //search method
 					this.$http.post('/search', { //post request
@@ -150,7 +154,12 @@
 							this.topictitle = ''; //reset
 						}		
 					}.bind(this));			
-				}						
+				},
+				recommend: function() { //recommend method
+					$.get('/recommend/', function(data, status){
+						this.predicted_policies = data.results;
+					}.bind(this));
+				}					
 			}
 		})
 

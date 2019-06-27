@@ -26,7 +26,10 @@
 			<a class="navbar-brand mb-0 h1" href="/homepage">
 				<img src="./static/img/icon.svg" width="30" height="30" class="d-inline-block align-top" alt=""> 
 				Welcome, {{ current_user.id }}!
-			</a>  		
+			</a>
+			<font color="white">
+				Age: {{ current_user.dateofbirth }} Job Type: {{ current_user.jobtype }} Date of Hire: {{ current_user.dateofhire }}
+			</font>	
 			<a class="btn btn-primary" href="/logout">Logout</a>
 		</div>
 	</nav>
