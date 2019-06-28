@@ -5,7 +5,7 @@
 	<div id="searchbar" class="container-fluid">
 		<div class="row">
 			<div class="col-xl-9 mx-auto">
-				<h2 class="mb-3">Human Resource Policies</h2>
+				<h1 class="mb-3">Human Resource Policies</h1>
 			</div>
 			<div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
 				<form v-on:submit.prevent="search">
@@ -23,16 +23,16 @@
 		<br><br>
 
 		<!-- Recommendations -->
-		<h6>Recommendations based on your profile</h6>
+		<h5>Recommended policies based on your profile:</h5>
 		<br>
 		<div class="row">
- 			<div id="reccard" class="card text-center" v-for="(row, index) in predicted_policies">
-		    	<b><font size="2" class="title">[[ index + 1 ]]) [[ row ]]</font></b>
+ 			<div id="reccard" class="card justify-content-center" v-for="(row, index) in predicted_policies">
+		    	<b><font size="2.5" class="title">[[ index + 1 ]]) [[ row ]]</font></b>
 		    	<div class="bar">
 			      	<div class="emptybar"></div>
 			      	<div class="filledbar"></div>
 		    	</div>
-		  	</div>
+		  	</div>	  	
 		</div>
 		<br><br>
 

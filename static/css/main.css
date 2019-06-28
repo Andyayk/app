@@ -38,9 +38,8 @@ a:hover {
   background-color: #E0E0E0;
 }
 
-body {
-  background-color: #100e17;
-  font-family: 'Open Sans', sans-serif;
+.card {
+  opacity: 0.9;
 }
 
 .container {
@@ -49,7 +48,7 @@ body {
 
 #reccard {
   display: flex;
-  height: 130px;
+  height: 120px;
   width: 200px;
   background-color: #D9EFF0;
   border-radius: 10px;
@@ -59,10 +58,11 @@ body {
   position: relative;
   left: 0px;
   margin: auto;
+  opacity: 0.85;
 }
 
 #reccard:not(:first-child) {
-    margin-left: -50px;
+  margin-left: -50px;
 }
 
 #reccard:hover {
@@ -85,7 +85,7 @@ body {
   top: 100px;
   left: 20px;
   height: 5px;
-  width: 150px;
+  width: 160px;
 }
 
 .emptybar {
@@ -106,7 +106,7 @@ body {
 }
 
 #reccard:hover .filledbar {
-  width: 150px;
+  width: 160px;
   transition: 0.4s ease-out;
 }
 
