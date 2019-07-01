@@ -58,7 +58,7 @@ a:hover {
   position: relative;
   left: 0px;
   margin: auto;
-  opacity: 0.80;
+  opacity: 0.85;
 }
 
 #reccard:not(:first-child) {

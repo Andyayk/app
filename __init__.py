@@ -163,14 +163,8 @@ def search():
 		stemmer = PorterStemmer()
 
 		q = request.json['query']
-		q2 = nltk.word_tokenize(q) #tokenize words
-		q3 = [w.lower() for w in q2] #lowercase
-		q4 = [w for w in q3 if re.search('^[a-z]+$', w)] #keep only alphabets
-		q5 = [stemmer.stem(w) for w in q4] #stemming
+		q = q.strip() #trim whitespace
 
-	except KeyError:
-		return []
-	else:
 		query = '''
 		MATCH (node:Policy)
 		WHERE node.name =~ {name}
@@ -183,33 +177,67 @@ def search():
 		RETURN node
 		LIMIT 1
 		'''		
-
-		q6 = ""
-		counter = 1
-		for word in q5:
-			q6 = q6 + word
-			if counter < len(q5):
-				q6 = q6 + "|"
-			counter += 1
 		
 		#get query that is case insensitive
-		results = graph.run(query, parameters={"name": "(?i).*(" + q6 + ").*"})
-		resultstest = graph.run(querytest, parameters={"name": "(?i).*(" + q6 + ").*"}) #checking if there are any results
+		results = graph.run(query, parameters={"name": "(?i).*(" + q + ").*"})
+		resultstest = graph.run(querytest, parameters={"name": "(?i).*(" + q + ").*"}) #checking if there are any results
 
 		if resultstest.evaluate(): #if there are results
 			return jsonify(
 				results = [{"policy": dict(row["node"])} for row in results]
 			)
 		else:
-			return jsonify(
-				results = [{"policy": {"name": "No Results Found!"}}]
-			)	
+			q2 = nltk.word_tokenize(q) #tokenize words
+			q3 = [w.lower() for w in q2] #lowercase
+			q4 = [w for w in q3 if re.search('^[a-z]+$', w)] #keep only alphabets
+			q5 = [stemmer.stem(w) for w in q4] #stemming
+
+			query = '''
+			MATCH (node:Policy)
+			WHERE node.name =~ {name}
+			RETURN node
+			'''
+
+			querytest = '''
+			MATCH (node:Policy)
+			WHERE node.name =~ {name}
+			RETURN node
+			LIMIT 1
+			'''		
+
+			q = ""
+			counter = 1
+			for word in q5:
+				q = q + word
+				if counter < len(q5):
+					q = q + "|"
+				counter += 1
+			
+			#get query that is case insensitive
+			results = graph.run(query, parameters={"name": "(?i).*(" + q + ").*"})
+			resultstest = graph.run(querytest, parameters={"name": "(?i).*(" + q + ").*"}) #checking if there are any results
+			
+			if resultstest.evaluate(): #if there are results
+				return jsonify(
+					results = [{"policy": dict(row["node"])} for row in results]
+				)
+			else:
+				return jsonify(
+					results = [{"policy": {"name": "No Results Found!"}}]
+				)
+	except KeyError:
+		return [{"policy": {"name": "No Results Found!"}}]
 
 #search for all related items of respective label
 @app.route("/get_related/", methods=["GET"])
 def get_related():
 	name  = request.args.get('name')
 	label  = request.args.get('label')
+
+	if name == "No Results Found!":
+		return jsonify(
+			results = None
+		)
 
 	if label == "Person": #so that it will only run once
 		query = '''

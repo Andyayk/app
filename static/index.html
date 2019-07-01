@@ -26,13 +26,15 @@
 		<i><h5>Recommended policies based on your profile:</h5></i>
 		<br>
 		<div class="row">
- 			<div id="reccard" class="card justify-content-center" v-for="(row, index) in predicted_policies">
-		    	<b><font size="2.75" class="title">[[ index + 1 ]]) [[ row ]]</font></b>
-		    	<div class="bar">
-			      	<div class="emptybar"></div>
-			      	<div class="filledbar"></div>
-		    	</div>
-		  	</div>	  	
+			<div style="cursor: pointer;" id="reccard" class="card justify-content-center" v-for="(row, index) in predicted_policies" v-on:click="recommend_search">
+				<div class="card-body">
+					<b><font size="2" class="title">[[ row ]]</font></b>
+					<div class="bar">
+						<div class="emptybar"></div>
+						<div class="filledbar"></div>
+					</div>						
+				</div>	    	
+			</div>	  	
 		</div>
 		<br><br>
 
@@ -47,9 +49,9 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr v-on:click="get_related" class="table-light" v-for="(row, index) in results">
+							<tr class="table-light" v-for="(row, index) in results">
 								<th scope="row">[[ index + 1 ]]</th>
-								<td style="cursor: pointer;">[[ row.policy.name ]]</td>
+								<td style="cursor: pointer;" v-on:click="get_related">[[ row.policy.name ]]</td>
 							</tr>
 						</tbody>
 					</table>
@@ -113,6 +115,12 @@
 					.then(function(response) {
 						this.showpolicytable = true; //show table to user
 						this.results = response.data.results; //set post response as results
+
+						var delayInMilliseconds = 0; //0.8 second
+						setTimeout(function() {
+						  //your code to be executed after 0.8 second
+						  document.querySelectorAll("#policytable td")[0].click();
+						}, delayInMilliseconds);						
 					})
 					.catch(function (error) { //error callback
 						console.log(response.data);
@@ -120,9 +128,10 @@
 				},
 				get_related: function(e) { //get related method
 					var element = e.target; //retrieve element
-					policyname = $(element).text();
+					policyname = $(element).text(); //retrieve text
 					document.getElementById("policyname").innerHTML = policyname; //set title
 					policyname = encodeURIComponent(policyname); //encode special symbols
+					
 					$.get('/get_related/?name=' + policyname + '&label=Person' , function(data, status){
 						policyinforesults = data.results;
 						if (policyinforesults != null) {
@@ -164,26 +173,15 @@
 					$.get('/recommend/', function(data, status){
 						this.predicted_policies = data.results;
 					}.bind(this));
-				}					
-			}
-		})
+				},
+				recommend_search: function(e) { //change query in textbox
+					var element = e.target; //retrieve element
+					var policyname = $(element).text(); //retrieve text
 
-		var recommendations = new Vue({
-			el: '#recommendations', //element name
-			delimiters: ['[[', ']]'], //to prevent syntax error with jinja
-			data: {
-				predicted_policies: ''
-			},
-			mounted:function(){
-				this.recommend() //method will execute at pageload
-			},			
-			methods: { // define methods under the `methods` object
-				recommend: function() { //recommend method
-					$.get('/recommend/', function(data, status){
-						this.predicted_policies = data.results;
-					}.bind(this));
+					this.query = policyname; //set query
+					this.search() //search query
 				}
 			}
-		})				
+		})
 	</script>
 {% endblock %}

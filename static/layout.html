@@ -21,15 +21,23 @@
 </head>
 <body> 
 	<!-- Navigation -->
-	<nav class="navbar navbar-dark bg-dark sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
 		<div class="container-fluid">
 			<a class="navbar-brand mb-0 h1" href="/homepage">
 				<img src="./static/img/icon.svg" width="30" height="30" class="d-inline-block align-top" alt=""> 
 				Welcome, {{ current_user.id }}!
 			</a>
-			<font color="white">
-				Age: {{ current_user.dateofbirth }} Job Type: {{ current_user.jobtype }} Date of Hire: {{ current_user.dateofhire }}
-			</font>	
+			<ul class="navbar-nav mr-auto">
+			    <li class="nav-item active">
+			        <a class="nav-link" href="/homepage">Date of Birth: {{ current_user.dateofbirth }}</a>
+			    </li>
+			    <li class="nav-item active">
+			        <a class="nav-link" href="/homepage">Job Type: {{ current_user.jobtype }}</a>
+			    </li>
+			    <li class="nav-item active">
+			        <a class="nav-link" href="/homepage">Date of Hire: {{ current_user.dateofhire }}</a>
+			    </li>		      		      
+		    </ul>											
 			<a class="btn btn-primary" href="/logout">Logout</a>
 		</div>
 	</nav>
