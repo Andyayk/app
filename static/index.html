@@ -23,7 +23,9 @@
 		<br><br>
 
 		<!-- Recommendations -->
-		<i><h5>Recommended policies based on your profile:</h5></i>
+		<template v-if="showrecommendation">
+			<i><h5>Recommended policies based on your profile:</h5></i>
+		</template>
 		<br>
 		<div class="row">
 			<div style="cursor: pointer;" id="reccard" class="card justify-content-center" v-for="(row, index) in predicted_policies" v-on:click="recommend_search">
@@ -98,7 +100,8 @@
 			data: {
 				query: '', 
 				results: '', 
-				showpolicytable: false, 
+				showpolicytable: false,
+				showrecommendation: false,
 				policyinfodata: '', 
 				relatedinfodata: '', 
 				topictitle: '',
@@ -172,6 +175,10 @@
 				recommend: function() { //recommend method
 					$.get('/recommend/', function(data, status){
 						this.predicted_policies = data.results;
+
+						if (this.predicted_policies.length > 0) {
+							this.showrecommendation = true; //show recommendation to user
+						}
 					}.bind(this));
 				},
 				recommend_search: function(e) { //change query in textbox
