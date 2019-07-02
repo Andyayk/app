@@ -234,7 +234,7 @@ def get_related():
 	name  = request.args.get('name')
 	label  = request.args.get('label')
 
-	if name == "No Results Found!":
+	if name == "No Results Found!": #if not found
 		return jsonify(
 			results = None
 		)
@@ -421,6 +421,9 @@ LOAD CSV WITH HEADERS FROM 'file:///searches.csv' AS line
 MATCH (node:User {username: line.username})
 MATCH (p:Policy) WHERE ID(p) = toInt(line.policyId)
 MERGE (node)-[s:SEARCH {numsearch: toInt(line.numsearch)}]->(p)
+
+LOAD CSV WITH HEADERS FROM 'file:///users.csv' AS line
+CREATE (:User { username: line.username, email: line.email, dateofbirth: line.dateofbirth, jobtype: line.jobtype, dateofhire: line.dateofhire, password: line.password})
 
 CREATE (ee:Person {name: 'Emil'})
 
