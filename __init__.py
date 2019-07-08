@@ -376,7 +376,7 @@ def recommend():
 
 #k-nearest neighbours
 def find_n_neighbours(df, n):
-	order = np.argsort(df.values, axis=1)[:, :n]
+	order = np.argsort(df.values, axis=1)[:, :n] #sort array and return index position
 	df = df.apply(lambda x: pd.Series(x.sort_values(ascending=False)
 		.iloc[:n].index, 
 		index=['top{}'.format(i) for i in range(1, n+1)]), 
