@@ -25,6 +25,11 @@ ul {
   text-align: left;
 }
 
+th, td {
+  padding: 0;
+  text-align: left;
+}
+
 .display {
   color: black;
 }
