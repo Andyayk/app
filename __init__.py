@@ -233,6 +233,7 @@ def search():
 def get_related():
 	name  = request.args.get('name')
 	label  = request.args.get('label')
+	image = ""
 
 	if name == "No Results Found!": #if not found
 		return jsonify(
@@ -263,6 +264,16 @@ def get_related():
 
 		graph.merge(relationship(user, policy, numsearch=numsearch), "Node", "name") #merging nodes with relationship		
 
+		query2 = '''
+		MATCH (node:Image)
+		RETURN node.image as image
+		'''
+
+		imageresults = graph.run(query2) #get image URL
+
+		for row in imageresults:
+			image = row["image"]
+
 	query = '''
 	MATCH (node:%s)-[relatedTo]-(:Policy {name: {name}}) 
 	RETURN node.name as name, Type(relatedTo) as relationship, node.text as text
@@ -290,9 +301,11 @@ def get_related():
 				dictionary[relationship] = dictionary[relationship] + ", " + row["name"]
 			else:
 				dictionary[relationship] = row["name"]
+
 		return jsonify(
 			results = dictionary,
-			textlist = textlist
+			textlist = textlist,
+			image = image
 		)
 	else:
 		return jsonify(
@@ -425,7 +438,7 @@ MERGE (node)-[s:SEARCH {numsearch: toInt(line.numsearch)}]->(p)
 LOAD CSV WITH HEADERS FROM 'file:///users.csv' AS line
 CREATE (:User { username: line.username, email: line.email, dateofbirth: line.dateofbirth, jobtype: line.jobtype, dateofhire: line.dateofhire, password: line.password})
 
-CREATE (ee:Person {name: 'Emil'})
+CREATE (node:Image {image: './static/img/charts.png'})
 
 MATCH (ee:Person) WHERE ee.name = "Emil" RETURN ee
 
