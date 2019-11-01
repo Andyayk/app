@@ -33,7 +33,7 @@ mysql-connector-python==8.0.16
 neo4j-driver==1.7.3
 neobolt==1.7.12
 neotime==1.7.4
-nltk==3.4.1
+nltk==3.4.5
 numpy==1.16.3
 pandas==0.24.2
 parsel==1.5.1
