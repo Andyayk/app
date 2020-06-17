@@ -39,7 +39,7 @@ def load_user(username):
 
 	query = '''
 	MATCH (node:User)
-	WHERE node.username =~ {name}
+	WHERE node.username =~ $name
 	RETURN node.email as email, node.dateofbirth as dateofbirth, node.jobtype as jobtype, node.dateofhire as dateofhire 
 	'''
 
@@ -66,13 +66,13 @@ def login():
 
 		query = '''
 		MATCH (node:User)
-		WHERE node.username =~ {name}
+		WHERE node.username =~ $name
 		RETURN node.password as password
 		'''
 
 		querytest = '''
 		MATCH (node:User)
-		WHERE node.username =~ {name}
+		WHERE node.username =~ $name
 		RETURN node.password as password
 		'''		
 
@@ -118,13 +118,13 @@ def register():
 
 		query = '''
 		MATCH (node:User)
-		WHERE node.username =~ {name}
+		WHERE node.username =~ $name
 		RETURN node
 		'''
 
 		querytest = '''
 		MATCH (node:User)
-		WHERE node.username =~ {name}
+		WHERE node.username =~ $name
 		RETURN node
 		'''		
 
@@ -167,13 +167,13 @@ def search():
 
 		query = '''
 		MATCH (node:Policy)
-		WHERE node.name =~ {name}
+		WHERE node.name =~ $name
 		RETURN node
 		'''
 
 		querytest = '''
 		MATCH (node:Policy)
-		WHERE node.name =~ {name}
+		WHERE node.name =~ $name
 		RETURN node
 		LIMIT 1
 		'''		
@@ -194,13 +194,13 @@ def search():
 
 			query = '''
 			MATCH (node:Policy)
-			WHERE node.name =~ {name}
+			WHERE node.name =~ $name
 			RETURN node
 			'''
 
 			querytest = '''
 			MATCH (node:Policy)
-			WHERE node.name =~ {name}
+			WHERE node.name =~ $name
 			RETURN node
 			LIMIT 1
 			'''		
@@ -243,7 +243,7 @@ def get_related():
 	if label == "Person": #so that it will only run once
 		query = '''
 		MATCH (node:User)
-		WHERE node.username = {username}
+		WHERE node.username = $username
 		RETURN node
 		'''
 		user = graph.evaluate(query, parameters={"username": current_user.id}) #retrieve user node
@@ -252,7 +252,7 @@ def get_related():
 		relationship = Relationship.type('SEARCH') #changing it into a relationship type
 		query2 = '''
 		MATCH (node:User)-[s:SEARCH]->(p:Policy)
-		WHERE p.name = {name} AND node.username = {username}
+		WHERE p.name = $name AND node.username = $username
 		RETURN s.numsearch
 		'''
 		numsearch = graph.evaluate(query2, parameters={"name": name, "username": current_user.id}) #retrieve numsearch
@@ -275,12 +275,12 @@ def get_related():
 			image = row["image"]
 
 	query = '''
-	MATCH (node:%s)-[relatedTo]-(:Policy {name: {name}}) 
+	MATCH (node:%s)-[relatedTo]-(:Policy {name: $name}) 
 	RETURN node.name as name, Type(relatedTo) as relationship, node.text as text
 	''' % (label) #string formatting
 
 	querytest = '''
-	MATCH (node:%s)-[relatedTo]-(:Policy {name: {name}}) 
+	MATCH (node:%s)-[relatedTo]-(:Policy {name: $name}) 
 	RETURN node.name as name, Type(relatedTo) as relationship, node.text as text
 	LIMIT 1
 	''' % (label) #string formatting
@@ -350,7 +350,7 @@ def recommend():
 
 	query4 = '''
 	MATCH (node:User)-[s:SEARCH]->(p:Policy) 
-    WHERE node.username = {username}
+    WHERE node.username = $username
 	RETURN node.username as username, ID(p) as policyId, s.numsearch as numsearch
 	'''
 	newuser = graph.run(query4, parameters={"username": current_user.id}) #check if new user
