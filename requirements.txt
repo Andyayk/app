@@ -103,7 +103,7 @@ requests-toolbelt==0.9.1
 s3transfer==0.3.3
 scikit-learn==0.23.1
 scipy==1.4.1
-Scrapy==2.1.0
+Scrapy==2.5.1
 seaborn==0.11.2
 service-identity==18.1.0
 SharePlum==0.5.1
