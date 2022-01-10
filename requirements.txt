@@ -1,6 +1,6 @@
 adal==1.2.4
-adjustText=0.6.1
-amqp==1.4.6
+adjustText==0.6.1
+amqp==1.4.9
 anyjson==0.3.3
 astroid==2.4.2
 attrs==19.3.0
@@ -23,8 +23,11 @@ constantly==15.1.0
 cryptography==2.9.2
 cssselect==1.1.0
 cycler==0.10.0
+cymem==2.0.3
 Cython==0.29.14
 docutils==0.15.2
+docx2python==1.26
+et-xmlfile==1.0.1
 Flask==1.1.2
 Flask-Cors==3.0.8
 Flask-Login==0.5.0
@@ -35,16 +38,18 @@ idna==2.9
 incremental==17.5.0
 isort==4.3.21
 itsdangerous==1.1.0
-jdcal=1.4.1
+jdcal==1.4.1
 Jinja2==2.11.2
 jmespath==0.10.0
 joblib==0.15.1
 kiwisolver==1.2.0
+kombu==3.0.37
 lazy-object-proxy==1.4.3
 lxml==4.5.1
 MarkupSafe==1.1.1
 matplotlib==3.2.1
 mccabe==0.6.1
+murmurhash==1.0.2
 neobolt==1.7.17
 neotime==1.7.4
 nltk==3.5
@@ -55,6 +60,7 @@ Office365-REST-Python-Client==2.1.7.post1
 openpyxl==3.0.5
 pandas==1.0.4
 parsel==1.6.0
+preshed==3.0.2
 prompt-toolkit==2.0.10
 Protego==0.1.16
 py2neo==4.3.0
@@ -65,6 +71,7 @@ PyDispatcher==2.0.5
 Pygments==2.3.1
 PyHamcrest==2.0.2
 PyJWT==1.7.1
+pyodbc==4.0.32
 pyOpenSSL==19.1.0
 pyparsing==2.4.7
 PyPDF2==1.26.0
